@@ -76,6 +76,9 @@ userSchema.methods = {
     //so sánh password với password trong db
     isCorrectPassword: async function (password) {
         return await bcrypt.compare(password, this.password )
+    },
+    createPasswordChangeToken: function (params) {
+        
     }
 }
 

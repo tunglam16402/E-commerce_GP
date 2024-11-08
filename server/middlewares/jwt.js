@@ -1,28 +1,10 @@
 const jwt = require('jsonwebtoken');
 
 //Tạo access token khi đăng nhập
-const generateAccessToken = (uid, role) => {
-    return jwt.sign(
-        {
-            _id: uid,
-            role,
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: '3d' },
-    );
-};
+const generateAccessToken = (uid, role) => jwt.sign({ _id: uid, role:role }, process.env.JWT_SECRET, { expiresIn: '2d' });
 
 // tạo refresh token khi gửi yêu cầu token hết hạn
-const generateRefreshToken = (uid, role) => {
-    return jwt.sign(
-        {
-            _id: uid,
-            role,
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: '7d' },
-    );
-};
+const generateRefreshToken = (uid) => jwt.sign({ _id: uid }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
 module.exports = {
     generateAccessToken,
