@@ -1,5 +1,6 @@
 const mongoose = require('mongoose'); // Erase if already required
 const bcrypt = require('bcrypt'); //hash password
+const crypto = require('crypto'); //random data
 
 // Declare the Schema of the Mongo model
 var userSchema = new mongoose.Schema(
@@ -75,12 +76,18 @@ userSchema.pre('save', async function (next) {
 userSchema.methods = {
     //so sánh password với password trong db
     isCorrectPassword: async function (password) {
-        return await bcrypt.compare(password, this.password )
+        return await bcrypt.compare(password, this.password);
     },
-    createPasswordChangeToken: function (params) {
-        
-    }
-}
+    //tạo token lưu trong db để gửi cho user khi post email để reset pw
+    createPasswordChangeToken: function () {
+        //Tạo chuỗi random gồm 32 ký tự
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+        //tạo tg hết hạn là 15p
+        this.passwordResetExpires = Date.now() + 15 * 60 * 1000;
+        return resetToken;
+    },
+};
 
 //Export the model
 module.exports = mongoose.model('User', userSchema);
