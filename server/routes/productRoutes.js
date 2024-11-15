@@ -5,6 +5,7 @@ const { verifyAccessToken, isAdmin } = require('../middlewares/verifyToken');
 
 router.post('/create_product', [verifyAccessToken, isAdmin], productControl.createProduct);
 router.get('/', productControl.getAllProduct);
+router.put('/ratings',verifyAccessToken, productControl.ratings);
 
 //xem sản phẩm thì không cần xác thực đăng nhập
 router.get('/:pid', productControl.getProduct);
