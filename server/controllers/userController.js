@@ -137,6 +137,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
         response,
     });
 });
+
 //API reset password
 const resetPassword = asyncHandler(async (req, res) => {
     const { token, password } = req.body;
