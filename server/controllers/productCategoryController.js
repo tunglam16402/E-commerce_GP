@@ -1,6 +1,5 @@
 const ProductCategory = require('../models/productCategoryModel');
 const asyncHandler = require('express-async-handler');
-const mongoose = require('mongoose');
 
 const createCategory = asyncHandler(async (req, res) => {
     const response = await ProductCategory.create(req.body);

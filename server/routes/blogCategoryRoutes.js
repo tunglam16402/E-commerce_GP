@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const Controllers = require('../controllers/BlogCategoryController');
+const Controllers = require('../controllers/blogCategoryController');
 
 const { verifyAccessToken, isAdmin } = require('../middlewares/verifyToken');
 
