@@ -164,6 +164,18 @@ const ratings = asyncHandler(async (req, res) => {
     });
 });
 
+//API upload product image
+const uploadImageProduct = asyncHandler(async (req, res) => {
+    console.log('Middleware upload.single được gọi');
+    if (req.file) {
+        console.log('File received:', req.file);
+        return res.status(200).json({ success: true, message: 'File uploaded to Cloudinary!', file: req.file });
+    } else {
+        console.log('No file received');
+        return res.status(400).json({ success: false, message: 'Failed to upload file.' });
+    }
+});
+
 module.exports = {
     createProduct,
     getProduct,
@@ -171,4 +183,5 @@ module.exports = {
     updateProduct,
     deleteProduct,
     ratings,
+    uploadImageProduct,
 };
