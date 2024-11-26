@@ -13,7 +13,7 @@ const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'shopthuongmaidientu',
-        format: async (req, file) => ['png', 'jpg'],
+        format: async (req, file) => 'png',
         public_id: (req, file) => file.originalname,
     },
 });

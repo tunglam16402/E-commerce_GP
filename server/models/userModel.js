@@ -28,15 +28,23 @@ var userSchema = new mongoose.Schema(
             required: true,
         },
         role: {
-            type: String,
-            default: 'user',
-        },
-        cart: {
             type: Array,
             default: [],
         },
+        cart: [
+            {
+                product: {
+                    type: mongoose.Types.ObjectId,
+                    ref: 'Product',
+                },
+                quantity: Number,
+                color: String,
+            },
+        ],
         // địa chỉ Id trỏ đến bảng address
-        address: [{ type: mongoose.Types.ObjectId, ref: 'Address' }],
+        address: {
+            type: String,
+        },
         //Id sản phẩm người dùng yêu thích trỏ đến bảng Product
         wishlist: [{ type: mongoose.Types.ObjectId, ref: 'Product' }],
         // kiểm tra có bị khóa tài khoản hay không
