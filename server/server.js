@@ -2,9 +2,18 @@ const express = require('express');
 const dbConnect = require('./config/dbconnect');
 const initRoutes = require('./routes');
 const cookieParse = require('cookie-parser');
+const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
+//chấp nhận cho localhost khác vào
+app.use(
+    cors({
+        origin: process.env.URL_CLIENT,
+        methods: ['POST', 'PUT', 'GET', 'DELETE'],
+    }),
+);
+
 const port = process.env.PORT || 8888;
 
 // đọc dữ liệu theo kiểu json hoặc urlencode
