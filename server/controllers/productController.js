@@ -166,7 +166,7 @@ const ratings = asyncHandler(async (req, res) => {
 
 //API upload product image
 const uploadImageProduct = asyncHandler(async (req, res) => {
-    const {pid} = req.params;
+    const { pid } = req.params;
     if (!req.files) {
         throw new Error('Missing inputs');
     }
