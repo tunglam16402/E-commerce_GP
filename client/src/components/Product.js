@@ -5,6 +5,8 @@ import labelBlue from '../assets/img/label_blue.png';
 import { renderStarFromNumber } from '../utils/helper';
 import { SelectOption } from './';
 import icons from '../utils/icons';
+import { Link } from 'react-router-dom';
+import path from '../utils/path';
 
 const { BsFillSuitHeartFill, AiFillEye, AiOutlineMenu } = icons;
 
@@ -13,8 +15,9 @@ const Product = ({ productData, isNew }) => {
 
     return (
         <div className="w-full text-base px-[10px]">
-            <div
+            <Link
                 className="w-full border p-[15px] flex flex-col items-center"
+                to={`/${path.DETAIL_PRODUCT}/${productData?._id}/${productData?.title}`}
                 onMouseEnter={(e) => {
                     e.stopPropagation();
                     setIsShowOption(true);
@@ -56,10 +59,14 @@ const Product = ({ productData, isNew }) => {
                 </div>
                 <div className="flex flex-col gap-1 mt-[15px] items-start w-full">
                     <span className="line-clamp-1">{productData?.title}</span>
-                    <span className="flex h-4">{renderStarFromNumber(productData?.totalRatings)}</span>
+                    <span className="flex h-4">
+                        {renderStarFromNumber(productData?.totalRatings)?.map((element, index) => (
+                            <span key={index}>{element}</span>
+                        ))}
+                    </span>
                     <span className="">{`${formatMoney(productData?.price)} VNĐ`}</span>
                 </div>
-            </div>
+            </Link>
         </div>
     );
 };

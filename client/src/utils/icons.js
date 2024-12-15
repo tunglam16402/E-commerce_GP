@@ -3,6 +3,7 @@ import { GrMail } from 'react-icons/gr';
 import { FaShoppingCart } from 'react-icons/fa';
 import { FaUser } from 'react-icons/fa';
 import { BsFillSuitHeartFill } from 'react-icons/bs';
+import { IoIosArrowForward } from 'react-icons/io';
 import { AiFillStar, AiOutlineStar, AiFillEye, AiOutlineMenu } from 'react-icons/ai';
 
 const icons = {
@@ -15,6 +16,7 @@ const icons = {
     BsFillSuitHeartFill,
     AiFillEye,
     AiOutlineMenu,
+    IoIosArrowForward,
 };
 
 export default icons;
