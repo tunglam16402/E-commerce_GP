@@ -1,18 +1,21 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Footer, Header, Navigation, TopHeader } from '../../components';
+import path from '../../utils/path';
 
-//trang public không cần đăng nhập
 const Public = () => {
+    const location = useLocation();
+    const isLoginPage = location.pathname === `/${path.AUTH}`;
+
     return (
         <div className="w-full flex flex-col items-center">
-            <TopHeader></TopHeader>
-            <Header></Header>
-            <Navigation></Navigation>
-            <div className="w-main">
+            {!isLoginPage && <TopHeader />}
+            <Header />
+            {!isLoginPage && <Navigation />}
+            <div className="w-full flex flex-col items-center">
                 <Outlet />
             </div>
-            <Footer></Footer>
+            <Footer />
         </div>
     );
 };

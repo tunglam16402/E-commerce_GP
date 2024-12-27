@@ -10,14 +10,14 @@ import path from '../utils/path';
 
 const { BsFillSuitHeartFill, AiFillEye, AiOutlineMenu } = icons;
 
-const Product = ({ productData, isNew }) => {
+const Product = ({ productData, isNew, normal }) => {
     const [isShowOption, setIsShowOption] = useState(false);
 
     return (
         <div className="w-full text-base px-[10px]">
             <Link
                 className="w-full border p-[15px] flex flex-col items-center"
-                to={`/${path.DETAIL_PRODUCT}/${productData?._id}/${productData?.title}`}
+                to={`/${productData?.category?.toLowerCase()}/${productData?._id}/${productData?.title}`}
                 onMouseEnter={(e) => {
                     e.stopPropagation();
                     setIsShowOption(true);
@@ -44,11 +44,13 @@ const Product = ({ productData, isNew }) => {
                         // className="w-[274px] h-[274px] object-cover"
                         className="w-full object-contain"
                     ></img>
-                    <img
-                        src={isNew ? label1 : labelBlue}
-                        alt=""
-                        className="absolute top-[-15px] left-[-47px] w-[140px] h-[35px] object-cover opacity-85"
-                    ></img>
+                    {!normal && (
+                        <img
+                            src={isNew ? label1 : labelBlue}
+                            alt=""
+                            className="absolute top-[-15px] left-[-47px] w-[140px] h-[35px] object-cover opacity-85"
+                        ></img>
+                    )}
                     <span
                         className="before:content-[''] before:w-[6px] before:h-[6px] before:rounded-[6px] 
                     before:bg-white before:absolute before:left-[-12px] before:top-[10px] before:z-[1] 

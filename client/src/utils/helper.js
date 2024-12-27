@@ -40,3 +40,42 @@ export const secondsToHms = (d) => {
     const s = Math.floor((d % 3600) % 60);
     return { h, m, s };
 };
+
+export const validate = (payload, setInvalidFields) => {
+    let invalids = 0;
+    const formatPayload = Object.entries(payload);
+    for (let array of formatPayload) {
+        if (array[1].trim() === '') {
+            invalids++;
+            setInvalidFields((prev) => [...prev, { name: array[0], message: 'Require this field.' }]);
+        }
+    }
+    for (let array of formatPayload) {
+        switch (array[0]) {
+            case 'email':
+                const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                if (!array[1].includes('@')) {
+                    invalids++;
+                    setInvalidFields((prev) => [
+                        ...prev,
+                        { name: array[0], message: 'Email must contain the "@" character' },
+                    ]);
+                } else if (!array[1].match(emailPattern)) {
+                    invalids++;
+                    setInvalidFields((prev) => [...prev, { name: array[0], message: 'Invalid email format' }]);
+                }
+                break;
+            case 'password':
+                if (array[1].length < 6) {
+                    invalids++;
+                    setInvalidFields((prev) => [...prev, { name: array[0], message: 'Password minimum 6 characters' }]);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    return invalids;
+};
+
+export const formatPrice = (number) => Math.round(number / 1000) * 1000;
