@@ -2,31 +2,117 @@ const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 const { generateAccessToken, generateRefreshToken } = require('../middlewares/jwt');
-const { json } = require('express');
+const { json, response } = require('express');
 const sendMail = require('../utils/sendMail');
 const crypto = require('crypto');
+const makeToken = require('uniqid');
+
 //API Register
+// const register = asyncHandler(async (req, res) => {
+//     const { email, password, firstname, lastname } = req.body;
+//     // nếu không có required : true thì không cần thiết phải chọc về db
+//     if (!email || !password || !firstname || !lastname) {
+//         return res.status(400).json({
+//             success: false,
+//             message: 'Missing input',
+//         });
+//     }
+//     // tìm người dùng theo email xem đã tồn tại chưa
+//     const user = await User.findOne({ email: email });
+//     if (user) {
+//         throw new Error('User already exists');
+//         // nếu không tồn tại email, tạo người dùng mới
+//     } else {
+//         const newUser = await User.create(req.body);
+//         return res.status(200).json({
+//             success: newUser ? true : false,
+//             message: newUser ? 'Registration successful. Please proceed to login.' : 'Something went wrong.',
+//         });
+//     }
+// });
 const register = asyncHandler(async (req, res) => {
-    const { email, password, firstname, lastname } = req.body;
-    // nếu không có required : true thì không cần thiết phải chọc về db
-    if (!email || !password || !firstname || !lastname) {
+    const { email, password, firstname, lastname, mobile } = req.body;
+    if (!email || !password || !firstname || !lastname || !mobile) {
         return res.status(400).json({
             success: false,
             message: 'Missing input',
         });
     }
-    // tìm người dùng theo email xem đã tồn tại chưa
     const user = await User.findOne({ email: email });
     if (user) {
         throw new Error('User already exists');
-        // nếu không tồn tại email, tạo người dùng mới
     } else {
-        const newUser = await User.create(req.body);
-        return res.status(200).json({
+        const token = makeToken();
+        //lưu token trong cookies
+        //     res.cookie('dataRegister', { ...req.body, token }, { httpOnly: true, maxAge: 15 * 60 * 1000 });
+        //     const html = `Please click on the link below to complete your account registration. This link will expire in 15 minutes from now.
+        // <a href=${process.env.URL_SERVER}/api/user/finalRegister/${token}>Click here !</a>`;
+        //     await sendMail({ email, html, subject: 'Complete your account registration ' });
+        //     return res.json({
+        //         success: true,
+        //         message: 'Please check your email to active account',
+        //     });
+
+        //lưu vào db
+        const emailEdited = btoa(email) + '@' + token;
+        const newUser = await User.create({
+            email: emailEdited,
+            password,
+            firstname,
+            lastname,
+            mobile,
+        });
+        if (newUser) {
+            const html = `<h2>Register code: </h2><br/><blockquote>${token}</blockquote>`;
+            await sendMail({ email, html, subject: 'Complete your account registration ' });
+        }
+        setTimeout(async () => {
+            await User.deleteOne({ email: emailEdited });
+        }, [300000]);
+        return res.json({
             success: newUser ? true : false,
-            message: newUser ? 'Registration successful. Please proceed to login.' : 'Something went wrong.',
+            message: newUser
+                ? 'Please check your email to active account'
+                : 'Something went wrong. Please try again later.',
         });
     }
+});
+
+//Api complete registration
+const finalRegister = asyncHandler(async (req, res) => {
+    // const cookie = req.cookies;
+    const { token } = req.params;
+    const notActivedEmail = await User.findOne({ email: new RegExp(`${token}`) });
+    if (notActivedEmail) {
+        notActivedEmail.email = atob(notActivedEmail?.email?.split('@')[0]);
+        notActivedEmail.save();
+    }
+    return res.json({
+        success: notActivedEmail ? true : false,
+        message: notActivedEmail
+            ? 'Register successfully. Please go login'
+            : 'Something went wrong. Please try again later.',
+    });
+    // if (!cookie || cookie?.dataRegister?.token !== token) {
+    //     console.log('Cookie or token mismatch');
+    //     res.clearCookie('dataRegister');
+    //     return res.redirect(`${process.env.URL_CLIENT}/finalRegister/failed`);
+    // }
+    // const newUser = await User.create({
+    //     email: cookie?.dataRegister?.email,
+    //     password: cookie?.dataRegister?.password,
+    //     mobile: cookie?.dataRegister?.mobile,
+    //     firstname: cookie?.dataRegister?.firstname,
+    //     lastname: cookie?.dataRegister?.lastname,
+    // });
+    // res.clearCookie('dataRegister');
+    // if (newUser) {
+    //     console.log('User created successfully');
+    //     return res.redirect(`${process.env.URL_CLIENT}/finalRegister/success`);
+    // } else {
+    //     console.log('Failed to create user');
+    //     return res.redirect(`${process.env.URL_CLIENT}/finalRegister/failed`);
+    // }
 });
 
 //API Login
@@ -70,7 +156,7 @@ const getCurrent = asyncHandler(async (req, res) => {
     const user = await User.findById({ _id }).select('-refreshToken -password -role');
     return res.status(200).json({
         success: !!user,
-        result: user ? user : 'User not found',
+        response: user ? user : 'User not found',
     });
 });
 
@@ -111,7 +197,7 @@ const logout = asyncHandler(async (req, res) => {
 
 //API change password
 const forgotPassword = asyncHandler(async (req, res) => {
-    const { email } = req.query;
+    const { email } = req.body;
     if (!email) {
         throw new Error('Missing email');
     }
@@ -123,18 +209,20 @@ const forgotPassword = asyncHandler(async (req, res) => {
     // lưu token vừa hứng đc vào db
     await user.save();
 
-    const html = `Xin vui lòng click vào link dưới đây để có thể thay đổi mật khẩu của bạn. 
-                Link này sẽ hết hạn sau 5 phút kể từ bây giờ. 
-                <a href=${process.env.URL_SERVER}/api/user/reset-password/${resetToken}>Click here !</a>`;
+    const html = `Please click on the link below to change your password. This link will expire in 5 minutes from now. 
+                <a href=${process.env.URL_CLIENT}/resetpassword/${resetToken}>Click here !</a>`;
 
     const data = {
         email: email,
         html,
+        subject: 'Forgot password',
     };
     const response = await sendMail(data);
     return res.status(200).json({
-        success: true,
-        response,
+        success: response.response?.includes('OK') ? true : false,
+        message: response.response?.includes('OK')
+            ? 'Please check your email to proceed with password recovery.'
+            : 'Somethings wrong happened. Please try again later',
     });
 });
 
@@ -156,7 +244,7 @@ const resetPassword = asyncHandler(async (req, res) => {
     await user.save();
     return res.status(200).json({
         success: user ? true : false,
-        message: user ? 'Update password' : 'something went wrong!',
+        message: user ? 'Updated password' : 'something went wrong!',
     });
 });
 
@@ -268,6 +356,7 @@ const updateCart = asyncHandler(async (req, res) => {
 
 module.exports = {
     register,
+    finalRegister,
     login,
     getCurrent,
     refreshAccessToken,

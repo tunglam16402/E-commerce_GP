@@ -45,6 +45,12 @@ const getAllProduct = asyncHandler(async (req, res) => {
     if (queries?.title) {
         formattedQueries.title = { $regex: queries.title, $options: 'i' };
     }
+    if (queries?.category) {
+        formattedQueries.category = { $regex: queries.category, $options: 'i' };
+    }
+    if (queries?.color) {
+        formattedQueries.color = { $regex: queries.color, $options: 'i' };
+    }
 
     let queryCommand = Product.find(formattedQueries);
 

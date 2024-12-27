@@ -28,8 +28,8 @@ var userSchema = new mongoose.Schema(
             required: true,
         },
         role: {
-            type: Array,
-            default: [],
+            type: String,
+            default: 'user',
         },
         cart: [
             {
@@ -41,7 +41,6 @@ var userSchema = new mongoose.Schema(
                 color: String,
             },
         ],
-        // địa chỉ Id trỏ đến bảng address
         address: {
             type: String,
         },
@@ -64,6 +63,9 @@ var userSchema = new mongoose.Schema(
         },
         //thời gian hết hạn token được gửi qua email
         passwordResetExpires: {
+            type: String,
+        },
+        registerToken: {
             type: String,
         },
     },
