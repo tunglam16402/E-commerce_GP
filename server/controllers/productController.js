@@ -21,7 +21,13 @@ const createProduct = asyncHandler(async (req, res) => {
 //API get 1 product
 const getProduct = asyncHandler(async (req, res) => {
     const { pid } = req.params;
-    const product = await Product.findById(pid);
+    const product = await Product.findById(pid).populate({
+        path: 'ratings',
+        populate: {
+            path: 'postedBy',
+            select: 'firstname lastname avatar',
+        },
+    });
     return res.status(200).json({
         success: product ? true : false,
         productData: product ? product : 'Can not get product',
@@ -36,11 +42,11 @@ const getAllProduct = asyncHandler(async (req, res) => {
     excludeFields.forEach((element) => delete queries[element]);
     //format lại operators cho đúng cú pháp mongoose
     let queryString = JSON.stringify(queries);
-    queryString = queryString.replace(/\b(gte|gt|lt|lte)\b/g, (matchedelement) => {
-        return `$${matchedelement}`;
+    queryString = queryString.replace(/\b(gte|gt|lt|lte)\b/g, (matchedElement) => {
+        return `$${matchedElement}`;
     });
     const formattedQueries = JSON.parse(queryString);
-
+    let colorQueryObject = {};
     //Filtering
     if (queries?.title) {
         formattedQueries.title = { $regex: queries.title, $options: 'i' };
@@ -49,10 +55,13 @@ const getAllProduct = asyncHandler(async (req, res) => {
         formattedQueries.category = { $regex: queries.category, $options: 'i' };
     }
     if (queries?.color) {
-        formattedQueries.color = { $regex: queries.color, $options: 'i' };
+        delete formattedQueries.color;
+        const colorArray = queries.color?.split(',');
+        const colorQuery = colorArray.map((element) => ({ color: { $regex: element, $options: 'i' } }));
+        colorQueryObject = { $or: colorQuery };
     }
-
-    let queryCommand = Product.find(formattedQueries);
+    const q = { ...colorQueryObject, ...formattedQueries };
+    let queryCommand = Product.find(q);
 
     //Sorting
     if (req.query.sort) {
@@ -79,7 +88,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
     //     if (err) {
     //         throw new Error(err.message);
     //     }
-    //     const counts = await Product.find(formattedQueries).countDocuments();
+    //     const counts = await Product.find(q).countDocuments();
     //     return res.status(200).json({
     //         success: response ? true : false,
     //         products: response ? response : 'Can not get products',
@@ -87,11 +96,11 @@ const getAllProduct = asyncHandler(async (req, res) => {
     //     });
     // });
     const response = await queryCommand.exec();
-    const counts = await Product.find(formattedQueries).countDocuments();
+    const counts = await Product.find(q).countDocuments();
     res.status(200).json({
         success: response ? true : false,
-        products: response || 'Cannot get products',
         counts,
+        products: response || 'Cannot get products',
     });
 });
 
@@ -121,7 +130,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 //API ratings
 const ratings = asyncHandler(async (req, res) => {
     const { _id } = req.user;
-    const { star, comment, pid } = req.body;
+    const { star, comment, pid, updatedAt } = req.body;
     if (!star || !pid) {
         throw new Error('Missing input!');
     }
@@ -129,7 +138,6 @@ const ratings = asyncHandler(async (req, res) => {
     const alreadyRating = ratingProduct?.ratings?.find((element) => {
         return element.postedBy.toString() === _id;
     });
-    console.log('ssssssssssss' + alreadyRating);
     if (alreadyRating) {
         //update stars and comments
         await Product.updateOne(
@@ -140,6 +148,7 @@ const ratings = asyncHandler(async (req, res) => {
                 $set: {
                     'ratings.$.star': star,
                     'ratings.$.comment': comment,
+                    'ratings.$.updatedAt': updatedAt,
                 },
             },
             { new: true },
@@ -150,7 +159,7 @@ const ratings = asyncHandler(async (req, res) => {
             pid,
             {
                 //đẩy data vào mảng
-                $push: { ratings: { star, comment, postedBy: _id } },
+                $push: { ratings: { star, comment, postedBy: _id, updatedAt } },
             },
             { new: true },
         );
