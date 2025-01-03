@@ -27,10 +27,14 @@ const DetailProduct = () => {
     const [product, setProduct] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const [relatedProducts, setRelatedProducts] = useState(null);
+    const [currentImage, setCurrentImage] = useState(null);
+    const [updateRate, setUpdateRate] = useState(false);
+
     const fetchProductData = async () => {
         const response = await apiGetDetailProducts(pid);
         if (response.success) {
             setProduct(response.productData);
+            setCurrentImage(response.productData?.thumb);
         }
     };
 
@@ -47,6 +51,16 @@ const DetailProduct = () => {
             fetchProduct();
         }
     }, [pid]);
+    //handle after submit rate product
+    useEffect(() => {
+        if (pid) {
+            fetchProductData();
+        }
+    }, [updateRate]);
+
+    const rerenderRateComment = useCallback(() => {
+        setUpdateRate(!updateRate);
+    }, [updateRate]);
 
     const handleQuantity = useCallback(
         (number) => {
@@ -68,6 +82,11 @@ const DetailProduct = () => {
         [quantity],
     );
 
+    const handleClickSmallImage = (e, element) => {
+        e.stopPropagation();
+        setCurrentImage(element);
+    };
+
     return (
         <div className="w-full">
             <div className="h-[81px] flex flex-col justify-center items-center bg-gray-100">
@@ -78,8 +97,8 @@ const DetailProduct = () => {
             </div>
             <div className="w-main m-auto mt-6 flex">
                 <div className="w-2/5 flex flex-col gap-4 ">
-                    <div className="w-[458px] h-[458px] border object-cover">
-                        {product && <ImageMagnifier smallImageSrc={product?.thumb} largeImageSrc={product?.thumb} />}
+                    <div className="w-[458px] h-[458px] border object-cover ">
+                        {product && <ImageMagnifier smallImageSrc={currentImage} largeImageSrc={currentImage} />}
                     </div>
                     <div className="w-[458px]">
                         <Slider {...settings} className="image_slider">
@@ -89,6 +108,7 @@ const DetailProduct = () => {
                                         src={element}
                                         alt="sub_product_img"
                                         className="w-[143px] h-[143px] border object-cover"
+                                        onClick={(e) => handleClickSmallImage(e, element)}
                                     ></img>
                                 </div>
                             ))}
@@ -105,7 +125,7 @@ const DetailProduct = () => {
                         {renderStarFromNumber(product?.totalRatings, 18)?.map((element, index) => (
                             <span key={index}>{element}</span>
                         ))}
-                        <span className="text-sm text-main italic ml-4">{`Sold: ${product?.sold}`}</span>
+                        <span className="text-sm text-main italic ml-4">{`Sold: ${product?.sold} products`}</span>
                     </div>
                     <ul className=" text-[16px] list-square text-gray-500 pl-8">
                         {product?.description?.map((element) => (
@@ -139,7 +159,13 @@ const DetailProduct = () => {
                 </div>
             </div>
             <div className="w-main m-auto mt-8">
-                <ProductInformation></ProductInformation>
+                <ProductInformation
+                    totalRatings={product?.totalRatings}
+                    ratings={product?.ratings}
+                    nameProduct={product?.title}
+                    pid={product?._id}
+                    rerenderRateComment={rerenderRateComment}
+                ></ProductInformation>
             </div>
             <div className="w-main m-auto mt-8">
                 <h3 className="text-[20px] font-semibold py-[15px] border-b-2 border-main uppercase">

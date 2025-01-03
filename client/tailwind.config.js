@@ -11,7 +11,7 @@ module.exports = {
             },
             backgroundColor: {
                 main: '#ee3131',
-                overlay: 'rgba(0,0,0,0.3)',
+                overlay: 'rgba(0,0,0,0.7)',
                 backdropBlur: { sm: '4px', md: '8px', lg: '12px', xl: '16px' },
             },
             colors: {
@@ -62,6 +62,5 @@ module.exports = {
             'slide-right': 'slide-right 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both',
         },
     },
-    plugins: [require('@tailwindcss/line-clamp')],
-    
+    plugins: [require('@tailwindcss/line-clamp'), require('@tailwindcss/forms')({ strategy: 'class' })],
 };

@@ -11,12 +11,17 @@ const { IoLogOutSharp } = icons;
 const TopHeader = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { isLoggedIn, current } = useSelector(state => state.user);
+    const { isLoggedIn, current } = useSelector((state) => state.user);
 
     useEffect(() => {
-        if (isLoggedIn) {
-            dispatch(getCurrent());
-        }
+        const setTimeoutId = setTimeout(() => {
+            if (isLoggedIn) {
+                dispatch(getCurrent());
+            }
+        }, 300);
+        return () => {
+            clearTimeout(setTimeoutId);
+        };
     }, [dispatch, isLoggedIn]);
 
     const handleLogout = () => {

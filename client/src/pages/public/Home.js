@@ -30,7 +30,7 @@ const Home = () => {
                     <CustomSlider products={newProducts}></CustomSlider>
                 </div>
             </div>
-            <div className="my-8 w-main">
+            <div className="w-main">
                 <h3 className="text-[20px] font-semibold py-[15px] border-b-2 border-main uppercase">
                     hot collections
                 </h3>

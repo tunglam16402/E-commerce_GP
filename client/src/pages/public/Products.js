@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
-import { Breadcrumbs, Product, SearchItem } from '../../components';
+import { useParams, useSearchParams, useNavigate, createSearchParams } from 'react-router-dom';
+import { Breadcrumbs, Product, SearchItem, InputSelect, Pagination } from '../../components';
 import { apiGetProducts } from '../../apis';
 import Masonry from 'react-masonry-css';
+import { sorts } from '../../utils/constant';
 
 const breakpointColumnsObj = {
     default: 4,
@@ -12,12 +13,14 @@ const breakpointColumnsObj = {
 };
 
 const Products = () => {
+    const navigate = useNavigate();
     const [product, setProduct] = useState(null);
     const [activedClick, setActivedClick] = useState(null);
     const [params] = useSearchParams();
+    const [sort, setSort] = useState('');
     const fetchProductsByCategory = async (queries) => {
         const response = await apiGetProducts(queries);
-        if (response.success) setProduct(response.products);
+        if (response.success) setProduct(response);
     };
 
     const { category } = useParams();
@@ -28,10 +31,27 @@ const Products = () => {
             param.push(i);
         }
         const queries = {};
+        let priceQuery = {};
         for (let i of params) {
             queries[i[0]] = i[1];
         }
-        fetchProductsByCategory(queries);
+        if (queries.from && queries.to) {
+            priceQuery = { $and: [{ price: { gte: queries.from } }, { price: { lte: queries.to } }] };
+            delete queries.price;
+        } else {
+            if (queries.from) {
+                queries.price = { gte: queries.from };
+            }
+            if (queries.to) {
+                queries.price = { lte: queries.to };
+            }
+        }
+
+        delete queries.from;
+        delete queries.to;
+
+        fetchProductsByCategory({ ...priceQuery, ...queries });
+        window.scrollTo(0, 0);
     }, [params]);
 
     const changeActivedFilter = useCallback(
@@ -44,6 +64,23 @@ const Products = () => {
         },
         [activedClick],
     );
+
+    //handle sort by
+    const changeValue = useCallback(
+        (value) => {
+            setSort(value);
+        },
+        [sort],
+    );
+
+    useEffect(() => {
+        if (sort) {
+            navigate({
+                pathname: `/${category}`,
+                search: createSearchParams({ sort }).toString(),
+            });
+        }
+    }, [sort]);
 
     return (
         <div className="w-full">
@@ -61,6 +98,7 @@ const Products = () => {
                             name="price"
                             activedClick={activedClick}
                             changeActivedFilter={changeActivedFilter}
+                            type="input"
                         ></SearchItem>
                         <SearchItem
                             name="color"
@@ -69,7 +107,12 @@ const Products = () => {
                         ></SearchItem>
                     </div>
                 </div>
-                <div className="w-1/5">sort by</div>
+                <div className="w-1/5 flex flex-col gap-3">
+                    <span className="font-semibold text-sm">Filter by</span>
+                    <div className="w-full">
+                        <InputSelect changeValue={changeValue} value={sort} options={sorts}></InputSelect>
+                    </div>
+                </div>
             </div>
             <div className="mt-4 w-main m-auto">
                 <Masonry
@@ -77,10 +120,13 @@ const Products = () => {
                     className="my-masonry-grid flex mx-[-10px]"
                     columnClassName="my-masonry-grid_column mb-[-20px]"
                 >
-                    {product?.map((element) => (
+                    {product?.products?.map((element) => (
                         <Product key={element._id} pid={element.id} productData={element} normal={true}></Product>
                     ))}
                 </Masonry>
+            </div>
+            <div className="w-main m-auto my-4 flex justify-end">
+                <Pagination totalCount={product?.counts}></Pagination>
             </div>
         </div>
     );

@@ -15,7 +15,7 @@ const CustomSlider = ({ products, activedTab, normal }) => {
     return (
         <>
             {products && (
-                <Slider {...settings} className='custom_slider'>
+                <Slider {...settings} className='custom_slider my-8'>
                     {products?.map((element, index) => (
                         <Product
                             key={index}
