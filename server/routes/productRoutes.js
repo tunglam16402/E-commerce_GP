@@ -4,15 +4,66 @@ const upload = require('../config/cloudinary.config');
 
 const { verifyAccessToken, isAdmin } = require('../middlewares/verifyToken');
 
-router.post('/create_product', [verifyAccessToken, isAdmin], Controllers.createProduct);
+router.post(
+    '/create-product',
+    [verifyAccessToken, isAdmin],
+    upload.fields([
+        {
+            name: 'images',
+            maxCount: 10,
+        },
+        {
+            name: 'thumb',
+            maxCount: 1,
+        },
+    ]),
+    Controllers.createProduct,
+);
 router.get('/', Controllers.getAllProduct);
 router.put('/ratings', verifyAccessToken, Controllers.ratings);
 
-router.put('/upload/:pid', [verifyAccessToken, isAdmin], upload.array('file', 10), Controllers.uploadImageProduct);
+router.put(
+    '/uploadimage/:pid',
+    [verifyAccessToken, isAdmin],
+    upload.array('images', 10),
+    Controllers.uploadImageProduct,
+);
+
+router.put(
+    '/variant/:pid',
+    [verifyAccessToken, isAdmin],
+    upload.fields([
+        {
+            name: 'images',
+            maxCount: 10,
+        },
+        {
+            name: 'thumb',
+            maxCount: 1,
+        },
+    ]),
+    Controllers.addVariant,
+);
 
 //xem sản phẩm thì không cần xác thực đăng nhập
 router.get('/:pid', Controllers.getProduct);
-router.put('/:pid', [verifyAccessToken, isAdmin], Controllers.updateProduct);
+
+router.put(
+    '/:pid',
+    [verifyAccessToken, isAdmin],
+    upload.fields([
+        {
+            name: 'images',
+            maxCount: 10,
+        },
+        {
+            name: 'thumb',
+            maxCount: 1,
+        },
+    ]),
+    Controllers.updateProduct,
+);
+
 router.delete('/:pid', [verifyAccessToken, isAdmin], Controllers.deleteProduct);
 
 module.exports = router;

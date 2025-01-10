@@ -6,6 +6,7 @@ const { json, response } = require('express');
 const sendMail = require('../utils/sendMail');
 const crypto = require('crypto');
 const makeToken = require('uniqid');
+const { users } = require('../utils/constants');
 
 //API Register
 // const register = asyncHandler(async (req, res) => {
@@ -153,7 +154,7 @@ const login = asyncHandler(async (req, res) => {
 //API get info current user login
 const getCurrent = asyncHandler(async (req, res) => {
     const { _id } = req.user;
-    const user = await User.findById({ _id }).select('-refreshToken -password -role');
+    const user = await User.findById({ _id }).select('-refreshToken -password');
     return res.status(200).json({
         success: !!user,
         response: user ? user : 'User not found',
@@ -250,36 +251,154 @@ const resetPassword = asyncHandler(async (req, res) => {
 
 //API get info all user login (Admin)
 const getUsers = asyncHandler(async (req, res) => {
-    const response = await User.find().select('-refreshToken -password -role');
-    return res.status(200).json({
-        success: response ? true : false,
-        users: response,
+    // const queries = { ...req.query };
+    // //Tách các trường đặc biệt ra khỏi query
+    // const excludeFields = ['limit', 'sort', 'page', 'fields'];
+    // excludeFields.forEach((element) => delete queries[element]);
+    // //format lại operators cho đúng cú pháp mongoose
+    // let queryString = JSON.stringify(queries);
+    // queryString = queryString.replace(/\b(gte|gt|lt|lte)\b/g, (matchedElement) => {
+    //     return `$${matchedElement}`;
+    // });
+    // const formattedQueries = JSON.parse(queryString);
+
+    // //Filtering
+    // if (queries?.name) {
+    //     formattedQueries.name = { $regex: queries.name, $options: 'i' };
+    // }
+    // let queryCommand = User.find(formattedQueries);
+    // //search admin user
+    // console.log('Query parameter q:', req.query.q);
+    // if (req.query.q) {
+    //     delete formattedQueries.q;
+    //     formattedQueries['$or'] = [
+    //         { firstname: { $regex: req.query.q, $options: 'i' } },
+    //         { lastname: { $regex: req.query.q, $options: 'i' } },
+    //         { email: { $regex: req.query.q, $options: 'i' } },
+    //     ];
+    // }
+
+    // //Sorting
+    // if (req.query.sort) {
+    //     // chuyển chuỗi từ dấu phẩy sang dấu cách eg    : abc,def => [abc, efg] => abc def
+    //     const sortBy = req.query.sort.split(',').join(' ');
+    //     queryCommand = queryCommand.sort(sortBy);
+    // }
+
+    // //Fields limtited
+    // if (req.query.fields) {
+    //     const fields = req.query.fields.split(',').join(' ');
+    //     queryCommand = queryCommand.select(fields);
+    // }
+
+    // //Pagination
+    // // dấu + để chuyển từ dạng chuỗi sang dạng số(string to number)
+    // const page = +req.query.page || 1;
+    // const limit = +req.query.limit || process.env.LIMIT_PRODUCTS;
+    // const skip = (page - 1) * limit;
+    // queryCommand.skip(skip).limit(limit);
+
+    // const response = await queryCommand.exec();
+    // const counts = await User.find(formattedQueries).countDocuments();
+    // res.status(200).json({
+    //     success: response ? true : false,
+    //     counts,
+    //     users: response ? response : 'Cannot get users',
+    // });
+    const queries = { ...req.query };
+
+    // Tách các trường đặc biệt ra khỏi query
+    const excludeFields = ['limit', 'sort', 'page', 'fields'];
+    excludeFields.forEach((element) => delete queries[element]);
+
+    // Format lại operators cho đúng cú pháp mongoose
+    let queryString = JSON.stringify(queries);
+    queryString = queryString.replace(/\b(gte|gt|lt|lte)\b/g, (matchedElement) => {
+        return `$${matchedElement}`;
     });
+    const formattedQueries = JSON.parse(queryString);
+
+    // Filtering
+    if (queries?.name) {
+        formattedQueries.name = { $regex: queries.name, $options: 'i' };
+    }
+
+    let queryCommand = User.find(formattedQueries);
+
+    // Search admin user
+    if (req.query.q) {
+        delete formattedQueries.q;
+        formattedQueries['$or'] = [
+            { firstname: { $regex: req.query.q, $options: 'i' } },
+            { lastname: { $regex: req.query.q, $options: 'i' } },
+            { email: { $regex: req.query.q, $options: 'i' } },
+        ];
+        queryCommand = User.find(formattedQueries);
+    }
+
+    // Sorting
+    if (req.query.sort) {
+        const sortBy = req.query.sort.split(',').join(' ');
+        queryCommand = queryCommand.sort(sortBy);
+    }
+
+    // Fields limited
+    if (req.query.fields) {
+        const fields = req.query.fields.split(',').join(' ');
+        queryCommand = queryCommand.select(fields);
+    }
+
+    // Pagination
+    // const page = +req.query.page || 1;
+    // const limit = +req.query.limit || process.env.LIMIT_PRODUCTS || 10;
+    // const skip = (page - 1) * limit;
+    // queryCommand = queryCommand.skip(skip).limit(limit);
+    const page = +req.query.page || 1;
+    const limit = +req.query.limit || process.env.LIMIT_PRODUCTS;
+    const skip = (page - 1) * limit;
+    queryCommand.skip(skip).limit(limit);
+
+    // Execute the query with error handling
+    try {
+        const response = await queryCommand.exec();
+        const counts = await User.find(formattedQueries).countDocuments();
+
+        res.status(200).json({
+            success: response ? true : false,
+            counts,
+            users: response ? response : 'Cannot get users',
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
 });
 
 //API delete user(Admin)
 const deleteUser = asyncHandler(async (req, res) => {
-    const { _id } = req.query;
-    if (!_id) {
-        throw new Error('Missing input');
-    }
-    const response = await User.findByIdAndDelete(_id);
+    const { uid } = req.params;
+    const response = await User.findByIdAndDelete(uid);
     return res.status(200).json({
         success: response ? true : false,
-        deleteUser: response ? `User with email ${response.email} deleted` : 'No user delete',
+        message: response ? `User with email ${response.email} deleted` : 'No user delete',
     });
 });
 
 //API update user
 const updateUser = asyncHandler(async (req, res) => {
     const { _id } = req.user;
+    const { firstname, lastname, email, mobile } = req.body;
+    const data = { firstname, lastname, email, mobile };
+    if (req.file) data.avatar = req.file.path;
     if (!_id || Object.keys(req.body).length === 0) {
         throw new Error('Missing inputs');
     }
-    const response = await User.findByIdAndUpdate(_id, req.body, { new: true }).select('-password -role -refreshToken');
+    const response = await User.findByIdAndUpdate(_id, data, { new: true }).select('-password -role -refreshToken');
     return res.status(200).json({
         success: response ? true : false,
-        deleteUser: response ? response : 'Something went wrong',
+        message: response ? "User's Information has been updated" : 'Something went wrong',
     });
 });
 
@@ -292,7 +411,7 @@ const updateUserByAdmin = asyncHandler(async (req, res) => {
     const response = await User.findByIdAndUpdate(uid, req.body, { new: true }).select('-password -role -refreshToken');
     return res.status(200).json({
         success: response ? true : false,
-        deleteUser: response ? response : 'Something went wrong',
+        message: response ? 'Updated' : 'Something went wrong',
     });
 });
 
@@ -306,7 +425,7 @@ const updateUserAddress = asyncHandler(async (req, res) => {
     );
     return res.status(200).json({
         success: response ? true : false,
-        deleteUser: response ? response : 'Something went wrong',
+        message: response ? response : 'Something went wrong',
     });
 });
 
@@ -354,6 +473,15 @@ const updateCart = asyncHandler(async (req, res) => {
     }
 });
 
+//API create user
+const createUser = asyncHandler(async (req, res) => {
+    const response = await User.create(users);
+    return res.status(200).json({
+        success: response ? true : false,
+        updateUser: response ? response : 'Something went wrong',
+    });
+});
+
 module.exports = {
     register,
     finalRegister,
@@ -369,4 +497,5 @@ module.exports = {
     updateUserByAdmin,
     updateUserAddress,
     updateCart,
+    createUser,
 };
