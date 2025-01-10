@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import {
     Authentication,
-    Register,
     Home,
     Public,
     Products,
@@ -12,13 +11,15 @@ import {
     FAQs,
     FinalRegister,
     ResetPassword,
-} from './pages/public';
-import path from './utils/path';
-import { getCategories } from './store/app/asyncAction';
+} from 'pages/public';
+import { AdminLayout, ManageOrders, ManageProducts, ManageUsers, Dashboard, CreateProducts } from 'pages/admin';
+import { MemberLayout, Personal, MyCart, HistoryBuy, WishList } from 'pages/member';
+import path from 'utils/path';
+import { getCategories } from 'store/app/asyncAction';
 import { useDispatch, useSelector } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { ScrollToTop, Modal } from './components';
+import { ScrollToTop, Modal } from 'components';
 
 function App() {
     const dispatch = useDispatch();
@@ -41,6 +42,20 @@ function App() {
                     <Route path={path.RESET_PASSWORD} element={<ResetPassword />}></Route>
                     <Route path={path.FINAL_REGISTER} element={<FinalRegister />}></Route>
                     <Route path={path.AUTH} element={<Authentication />}></Route>
+                    <Route path={path.ALL} element={<Home />}></Route>
+                </Route>
+                <Route path={path.ADMIN} element={<AdminLayout />}>
+                    <Route path={path.DASHBOARD} element={<Dashboard />}></Route>
+                    <Route path={path.MANAGE_USER} element={<ManageUsers />}></Route>
+                    <Route path={path.MANAGE_PRODUCTS} element={<ManageProducts />}></Route>
+                    <Route path={path.MANAGE_ORDER} element={<ManageOrders />}></Route>
+                    <Route path={path.CREATE_PRODUCTS} element={<CreateProducts />}></Route>
+                </Route>
+                <Route path={path.MEMBER} element={<MemberLayout />}>
+                    <Route path={path.PERSONAL} element={<Personal />}></Route>
+                    <Route path={path.MY_CART} element={<MyCart />}></Route>
+                    <Route path={path.WISHLIST} element={<WishList />}></Route>
+                    <Route path={path.HISTORY_BUY} element={<HistoryBuy />}></Route>
                 </Route>
             </Routes>
             <ToastContainer

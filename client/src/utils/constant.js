@@ -1,6 +1,24 @@
 import icons from './icons';
 import path from './path';
 
+const {
+    BsShieldShaded,
+    FaTruck,
+    HiGift,
+    FaReply,
+    FaTty,
+    MdSpaceDashboard,
+    RiBillLine,
+    MdGroups2,
+    FaProductHunt,
+    IoCreate,
+    FaStore,
+    IoPersonCircle,
+    MdFavorite,
+    FaHistory,
+    FaShoppingCart,
+} = icons;
+
 export const navigation = [
     {
         id: 1,
@@ -29,7 +47,6 @@ export const navigation = [
     },
 ];
 
-const { BsShieldShaded, FaTruck, HiGift, FaReply, FaTty } = icons;
 export const productExtraInformation = [
     { id: 1, title: 'Guarantee', sub: 'Quality checked', icon: <BsShieldShaded></BsShieldShaded> },
     { id: 2, title: 'Free Shipping', sub: 'Free on all products', icon: <FaTruck></FaTruck> },
@@ -138,4 +155,100 @@ export const rateOptions = [
     { id: 3, text: 'Neutral' },
     { id: 4, text: 'Good' },
     { id: 5, text: 'Perfect' },
+];
+
+export const adminSidebar = [
+    {
+        id: 1,
+        type: 'SINGLE',
+        text: 'Dashboard',
+        path: `/${path.ADMIN}/${path.DASHBOARD}`,
+        icon: <MdSpaceDashboard size={20} />,
+    },
+    {
+        id: 2,
+        type: 'SINGLE',
+        text: 'Manage Users',
+        path: `/${path.ADMIN}/${path.MANAGE_USER}`,
+        icon: <MdGroups2 size={20} />,
+    },
+    {
+        id: 3,
+        type: 'PARENT',
+        text: 'Manage Products',
+        icon: <FaStore size={20} />,
+        submenu: [
+            {
+                text: 'Create Product',
+                path: `/${path.ADMIN}/${path.CREATE_PRODUCTS}`,
+                icon: <IoCreate size={20} />,
+            },
+            {
+                text: 'Product List',
+                path: `/${path.ADMIN}/${path.MANAGE_PRODUCTS}`,
+                icon: <FaProductHunt size={20} />,
+            },
+        ],
+    },
+    {
+        id: 4,
+        type: 'SINGLE',
+        text: 'Manage Orders',
+        path: `/${path.ADMIN}/${path.MANAGE_ORDER}`,
+        icon: <RiBillLine size={20} />,
+    },
+];
+
+export const role = [
+    {
+        code: 2002,
+        value: 'Admin',
+    },
+    {
+        code: 2006,
+        value: 'User',
+    },
+];
+
+export const blockStatus = [
+    {
+        code: true,
+        value: 'Blocked',
+    },
+    {
+        code: false,
+        value: 'Active',
+    },
+];
+
+export const memberSidebar = [
+    {
+        id: 1,
+        type: 'SINGLE',
+        text: 'Personal',
+        path: `/${path.MEMBER}/${path.PERSONAL}`,
+        icon: <IoPersonCircle size={20} />,
+    },
+    {
+        id: 2,
+        type: 'SINGLE',
+        text: 'My Cart',
+        path: `/${path.MEMBER}/${path.MY_CART}`,
+        icon: <FaShoppingCart size={20} />,
+    },
+    {
+        id: 3,
+        type: 'SINGLE',
+        text: 'Wish List',
+        path: `/${path.MEMBER}/${path.WISHLIST}`,
+        icon: <MdFavorite size={20} />,
+    },
+
+    {
+        id: 4,
+        type: 'SINGLE',
+        text: 'History Purchases',
+        path: `/${path.MEMBER}/${path.HISTORY_BUY}`,
+        icon: <FaHistory size={20} />,
+    },
 ];

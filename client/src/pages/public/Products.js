@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import { useParams, useSearchParams, useNavigate, createSearchParams } from 'react-router-dom';
 import { Breadcrumbs, Product, SearchItem, InputSelect, Pagination } from '../../components';
 import { apiGetProducts } from '../../apis';
@@ -26,15 +26,8 @@ const Products = () => {
     const { category } = useParams();
 
     useEffect(() => {
-        let param = [];
-        for (let i of params.entries()) {
-            param.push(i);
-        }
-        const queries = {};
+        const queries = Object.fromEntries([...params]);
         let priceQuery = {};
-        for (let i of params) {
-            queries[i[0]] = i[1];
-        }
         if (queries.from && queries.to) {
             priceQuery = { $and: [{ price: { gte: queries.from } }, { price: { lte: queries.to } }] };
             delete queries.price;
@@ -132,4 +125,4 @@ const Products = () => {
     );
 };
 
-export default Products;
+export default memo(Products);

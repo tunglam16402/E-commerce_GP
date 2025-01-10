@@ -86,3 +86,21 @@ export const generateRange = (start, end) => {
     const length = end + 1 - start;
     return Array.from({ length }, (_, index) => start + index);
 };
+
+//reiview img when upload file
+export const getBase64 = (file) => {
+    if (!file) return '';
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            // let encoded = reader.result.toString().replace(/^data:(.*,)?/, '');
+            // if ((encoded.length % 4) > 0) {
+            //   encoded += '='.repeat(4 - (encoded.length % 4));
+            // }
+            // resolve(encoded);
+            resolve(reader.result);
+        };
+        reader.onerror = (error) => reject(error);
+    });
+};

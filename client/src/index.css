@@ -94,3 +94,8 @@ input[type='number'] {
 .my-masonry-grid_column > div {
     margin-bottom: 30px;
 }
+
+/* css for markdown code */
+code {
+    white-space: initial;
+}

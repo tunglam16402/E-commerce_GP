@@ -19,3 +19,30 @@ export const apiRatings = (data) =>
         method: 'put',
         data,
     });
+
+export const apiCreateProduct = (data) =>
+    axios({
+        url: '/product/create-product',
+        method: 'post',
+        data,
+    });
+
+export const apiUpdateProduct = (data, pid) =>
+    axios({
+        url: '/product/' + pid,
+        method: 'put',
+        data,
+    });
+
+export const apiDeleteProduct = (pid) =>
+    axios({
+        url: '/product/' + pid,
+        method: 'delete',
+    });
+
+export const apiAddVariant = (pid, data) =>
+    axios({
+        url: '/product/variant/' + pid,
+        method: 'put',
+        data,
+    });
