@@ -11,27 +11,39 @@ import {
     FAQs,
     FinalRegister,
     ResetPassword,
+    DetailCart,
 } from 'pages/public';
 import { AdminLayout, ManageOrders, ManageProducts, ManageUsers, Dashboard, CreateProducts } from 'pages/admin';
-import { MemberLayout, Personal, MyCart, HistoryBuy, WishList } from 'pages/member';
+import { MemberLayout, Personal, MyCart, HistoryBuy, WishList, CheckOut } from 'pages/member';
 import path from 'utils/path';
 import { getCategories } from 'store/app/asyncAction';
 import { useDispatch, useSelector } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { ScrollToTop, Modal } from 'components';
+import { ScrollToTop, Modal, Cart } from 'components';
+import { showCart } from 'store/app/appSlice';
 
 function App() {
     const dispatch = useDispatch();
-    const [isShowModal, modalChildren] = useSelector((state) => [state.app.isShowModal, state.app.modalChildren]);
+    const [isShowModal, modalChildren, isShowCart] = useSelector((state) => [
+        state.app.isShowModal,
+        state.app.modalChildren,
+        state.app.isShowCart,
+    ]);
     useEffect(() => {
         dispatch(getCategories());
     }, []);
     return (
-        <div className=" font-main relative">
+        <div className=" font-main relative h-screen">
             <ScrollToTop />
+            {isShowCart && (
+                <div onClick={() => dispatch(showCart())} className="absolute inset-0 bg-overlay z-50 flex justify-end">
+                    <Cart />
+                </div>
+            )}
             {isShowModal && <Modal>{modalChildren}</Modal>}
             <Routes>
+                <Route path={path.CHECKOUT} element={<CheckOut />}></Route>
                 <Route path={path.PUBLIC} element={<Public />}>
                     <Route path={path.HOME} element={<Home />}></Route>
                     <Route path={path.PRODUCTS} element={<Products />}></Route>
@@ -41,6 +53,7 @@ function App() {
                     <Route path={path.FAQS} element={<FAQs />}></Route>
                     <Route path={path.RESET_PASSWORD} element={<ResetPassword />}></Route>
                     <Route path={path.FINAL_REGISTER} element={<FinalRegister />}></Route>
+                    <Route path={path.DETAIL_CART} element={<DetailCart />}></Route>
                     <Route path={path.AUTH} element={<Authentication />}></Route>
                     <Route path={path.ALL} element={<Home />}></Route>
                 </Route>

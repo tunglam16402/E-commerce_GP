@@ -9,6 +9,7 @@ export const userSlice = createSlice({
         token: null,
         isLoading: false,
         message: '',
+        currentCart: [],
     },
     reducers: {
         login: (state, action) => {
@@ -25,6 +26,19 @@ export const userSlice = createSlice({
         clearMessage: (state) => {
             state.message = '';
         },
+        updateCart: (state, action) => {
+            const { pid, color, quantity } = action.payload;
+            const updatingCart = JSON.parse(JSON.stringify(state.currentCart));
+            console.log([...updatingCart]);
+            const updatedCart = updatingCart.map((element) => {
+                if (element.color === color && element.product?._id === pid) {
+                    return { ...element, quantity };
+                } else {
+                    return element;
+                }
+            });
+            state.currentCart = updatedCart;
+        },
     },
     // Code logic xử lý async action
     extraReducers: (builder) => {
@@ -38,6 +52,7 @@ export const userSlice = createSlice({
             state.isLoading = false;
             state.current = action.payload;
             state.isLoggedIn = true;
+            state.currentCart = action.payload.cart;
         });
 
         // Khi thực hiện action actions thất bại (Promise rejected)
@@ -52,6 +67,6 @@ export const userSlice = createSlice({
     },
 });
 
-export const { login, logout, clearMessage } = userSlice.actions;
+export const { login, logout, clearMessage, updateCart } = userSlice.actions;
 
 export default userSlice.reducer;

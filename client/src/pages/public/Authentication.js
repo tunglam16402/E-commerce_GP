@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
@@ -28,6 +28,7 @@ const Authentication = () => {
     const [email, setEmail] = useState('');
     const [token, setToken] = useState('');
     const [isVerifyEmail, setIsVerifyEmail] = useState(false);
+    const [searchParams] = useSearchParams();
 
     const resetPayload = () => {
         setPayload({
@@ -73,7 +74,7 @@ const Authentication = () => {
                     dispatch(
                         login({ isLoggedIn: true, token: loginResponse.accessToken, userData: loginResponse.userData }),
                     );
-                    navigate(`/${path.HOME}`);
+                    searchParams.get('redirect') ? navigate(searchParams.get('redirect')) : navigate(`/${path.HOME}`);
                 } else {
                     Swal.fire('Oops!', loginResponse.message, 'error');
                 }

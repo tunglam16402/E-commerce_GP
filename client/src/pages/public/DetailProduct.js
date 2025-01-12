@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { apiGetDetailProducts, apiGetProducts } from '../../apis';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { createSearchParams, data, useParams } from 'react-router-dom';
+import { apiGetDetailProducts, apiGetProducts, apiUpdateCart } from '../../apis';
 import {
     Breadcrumbs,
     Button,
@@ -15,6 +15,12 @@ import { formatMoney, formatPrice, renderStarFromNumber } from '../../utils/help
 import { productExtraInformation } from '../../utils/constant';
 import DOMPurify from 'dompurify';
 import clsx from 'clsx';
+import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
+import withBaseComponent from 'hocs/withBaseComponent';
+import Swal from 'sweetalert2';
+import path from 'utils/path';
+import { getCurrent } from 'store/users/asyncAction';
 
 const settings = {
     dots: false,
@@ -24,14 +30,18 @@ const settings = {
     slidesToScroll: 1,
 };
 
-const DetailProduct = () => {
-    const { pid, category } = useParams();
+const DetailProduct = ({ isQuickView, data, dispatch, navigate, location }) => {
+    const params = useParams();
+    const titleRef = useRef();
+    const { current } = useSelector((state) => state.user);
     const [product, setProduct] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const [relatedProducts, setRelatedProducts] = useState(null);
     const [currentImage, setCurrentImage] = useState(null);
     const [updateRate, setUpdateRate] = useState(false);
     const [variant, setVariant] = useState(null);
+    const [pid, setPid] = useState(null);
+    const [category, setCategory] = useState(null);
     const [currentProduct, setCurrentProduct] = useState({
         title: '',
         thumb: '',
@@ -39,6 +49,18 @@ const DetailProduct = () => {
         price: '',
         color: '',
     });
+
+    //handle show quick view
+    useEffect(() => {
+        if (data) {
+            setPid(data.pid);
+            setCategory(data.category);
+        } else if (params && params.pid) {
+            setPid(params.pid);
+            setCategory(params.category);
+        }
+    }, [data, params]);
+    console.log(data);
 
     const fetchProductData = async () => {
         const response = await apiGetDetailProducts(pid);
@@ -64,6 +86,14 @@ const DetailProduct = () => {
                 price: product?.variants?.find((element) => element.sku === variant)?.price,
                 thumb: product?.variants?.find((element) => element.sku === variant)?.thumb,
             });
+        } else {
+            setCurrentProduct({
+                title: product?.title,
+                color: product?.color,
+                images: product?.images || [],
+                price: product?.price,
+                thumb: product?.thumb,
+            });
         }
     }, [variant]);
 
@@ -72,6 +102,7 @@ const DetailProduct = () => {
             fetchProductData();
             fetchProduct();
         }
+        titleRef.current.scrollIntoView({ block: 'start' });
     }, [pid]);
     //handle after submit rate product
     useEffect(() => {
@@ -112,15 +143,55 @@ const DetailProduct = () => {
         setCurrentImage(element);
     };
 
+    const handleAddToCart = async () => {
+        if (!current) {
+            Swal.fire({
+                title: 'Almost...',
+                text: 'Your must login first to buy this',
+                cancelButtonText: 'Not now',
+                confirmButtonText: 'Go login',
+                icon: 'info',
+                showCancelButton: true,
+            }).then(async (response) => {
+                if (response.isConfirmed) {
+                    navigate({
+                        pathname: `/${path.AUTH}`,
+                        search: createSearchParams({ redirect: location.pathname }).toString(),
+                    });
+                }
+            });
+        }
+        const response = await apiUpdateCart({
+            pid,
+            color: currentProduct.color || product?.color,
+            quantity,
+            price: currentProduct.price || product.price,
+            thumb: currentProduct.thumb || product.thumb,
+            title: currentProduct.title || product.title,
+        });
+        if (response.success) {
+            toast.success(response.message);
+            dispatch(getCurrent());
+        } else toast.error(response.message);
+    };
+
     return (
         <div className="w-full">
-            <div className="h-[81px] flex flex-col justify-center items-center bg-gray-100">
-                <div className=" w-main">
-                    <h3 className="font-semibold text-[22px]">{currentProduct.title || product?.title}</h3>
-                    <Breadcrumbs title={currentProduct.title || product?.title} category={category}></Breadcrumbs>
+            {!isQuickView && (
+                <div className="h-[81px] flex flex-col justify-center items-center bg-gray-100">
+                    <div ref={titleRef} className=" w-main">
+                        <h3 className="font-semibold text-[22px]">{currentProduct.title || product?.title}</h3>
+                        <Breadcrumbs title={currentProduct.title || product?.title} category={category}></Breadcrumbs>
+                    </div>
                 </div>
-            </div>
-            <div className="w-main m-auto mt-6 flex">
+            )}
+            <div
+                onClick={(e) => e.stopPropagation()}
+                className={clsx(
+                    'w-main m-auto mt-6 flex bg-white',
+                    isQuickView ? 'max-w-[900px] gap-36 p-6 max-h-[100vh] overflow-y-auto' : 'w-main ',
+                )}
+            >
                 <div className="w-2/5 flex flex-col gap-4 ">
                     <div className="w-[458px] h-[458px] border object-cover flex items-center z-50 ">
                         {product && (
@@ -157,7 +228,7 @@ const DetailProduct = () => {
                         </Slider>
                     </div>
                 </div>
-                <div className="w-2/5 pr-[24px] flex flex-col gap-4">
+                <div className={clsx('w-2/5 pr-[24px] flex flex-col gap-4', isQuickView && 'w-1/2')}>
                     <div className="flex items-center justify-between">
                         <h2 className="text-[34px] font-semibold text-gray-700">{`${formatMoney(
                             formatPrice(currentProduct.price || product?.price),
@@ -205,6 +276,7 @@ const DetailProduct = () => {
                             </div>
                             {product?.variants?.map((element) => (
                                 <div
+                                    key={element.sku}
                                     onClick={() => setVariant(element.sku)}
                                     className={clsx(
                                         'flex items-center gap-2 p-1 border cursor-pointer',
@@ -234,37 +306,45 @@ const DetailProduct = () => {
                             ></SelectQuantity>
                             <span className="text-sm text-main ml-8">{`Products available: ${product?.quantity}`}</span>
                         </div>
-                        <Button fullWidth>Add to cart</Button>
+                        <Button handleOnclick={handleAddToCart} fullWidth>
+                            Add to cart
+                        </Button>
                     </div>
                 </div>
-                <div className="w-1/5 ">
-                    {productExtraInformation.map((element) => (
-                        <ProductExtraInfoItem
-                            key={element.id}
-                            title={element.title}
-                            icon={element.icon}
-                            sub={element.sub}
-                        ></ProductExtraInfoItem>
-                    ))}
+                {!isQuickView && (
+                    <div className="w-1/5 ">
+                        {productExtraInformation.map((element) => (
+                            <ProductExtraInfoItem
+                                key={element.id}
+                                title={element.title}
+                                icon={element.icon}
+                                sub={element.sub}
+                            ></ProductExtraInfoItem>
+                        ))}
+                    </div>
+                )}
+            </div>
+            {!isQuickView && (
+                <div className="w-main m-auto mt-8">
+                    <ProductInformation
+                        totalRatings={product?.totalRatings}
+                        ratings={product?.ratings}
+                        nameProduct={product?.title}
+                        pid={product?._id}
+                        rerenderRateComment={rerenderRateComment}
+                    ></ProductInformation>
                 </div>
-            </div>
-            <div className="w-main m-auto mt-8">
-                <ProductInformation
-                    totalRatings={product?.totalRatings}
-                    ratings={product?.ratings}
-                    nameProduct={product?.title}
-                    pid={product?._id}
-                    rerenderRateComment={rerenderRateComment}
-                ></ProductInformation>
-            </div>
-            <div className="w-main m-auto mt-8">
-                <h3 className="text-[20px] font-semibold py-[15px] border-b-2 border-main uppercase">
-                    Other also like
-                </h3>
-                <CustomSlider normal={true} products={relatedProducts}></CustomSlider>
-            </div>
+            )}
+            {!isQuickView && (
+                <div className="w-main m-auto mt-8">
+                    <h3 className="text-[20px] font-semibold py-[15px] border-b-2 border-main uppercase">
+                        Other also like
+                    </h3>
+                    <CustomSlider normal={true} products={relatedProducts}></CustomSlider>
+                </div>
+            )}
         </div>
     );
 };
 
-export default DetailProduct;
+export default withBaseComponent(memo(DetailProduct));

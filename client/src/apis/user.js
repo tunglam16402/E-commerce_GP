@@ -25,6 +25,10 @@ export const apiGetUsers = (params) => axios({ url: '/user/', method: 'get', par
 
 export const apiUpdateCurrent = (data) => axios({ url: '/user/current', method: 'put', data: data });
 
+export const apiUpdateCart = (data) => axios({ url: '/user/cart', method: 'put', data: data });
+
+export const apiRemoveCart = (pid, color) => axios({ url: `/user/remove-cart/${pid}/${color}`, method: 'delete' });
+
 //admin
 export const apiUpdateUsers = (data, uid) => axios({ url: '/user/' + uid, method: 'put', data: data });
 

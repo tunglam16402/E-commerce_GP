@@ -7,13 +7,14 @@ import icons from 'utils/icons';
 import path from 'utils/path';
 import { useState } from 'react';
 import { logout } from 'store/users/userSlice';
+import withBaseComponent from 'hocs/withBaseComponent';
+import { showCart } from 'store/app/appSlice';
 
 const { RiPhoneFill, GrMail, FaShoppingCart, FaUser } = icons;
 
-const Header = () => {
+const Header = ({ dispatch }) => {
     const { current } = useSelector((state) => state.user);
     const [isShowOption, setIsShowOption] = useState(false);
-    const dispatch = useDispatch();
     //handle when click out after click mouse some effect
     useEffect(() => {
         const handleClickOutOptions = (e) => {
@@ -49,9 +50,12 @@ const Header = () => {
                 </div>
                 {current && (
                     <>
-                        <div className=" cursor-pointer flex px-6 border-r items-center justify-center gap-2 text-[16px]">
+                        <div
+                            onClick={() => dispatch(showCart())}
+                            className=" cursor-pointer flex px-6 border-r items-center justify-center gap-2 text-[16px]"
+                        >
                             <FaShoppingCart color="red"></FaShoppingCart>
-                            <span>0 item(s)</span>
+                            <span>{`${current?.cart?.length || 0} item(s)`}</span>
                         </div>
                         <div
                             className="cursor-pointer flex px-6 items-center justify-center gap-2 text-[16px] relative"
@@ -92,4 +96,4 @@ const Header = () => {
     );
 };
 
-export default memo(Header);
+export default withBaseComponent(memo(Header));

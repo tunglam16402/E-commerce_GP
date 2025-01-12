@@ -8,7 +8,7 @@ const Public = () => {
     const isLoginPage = location.pathname === `/${path.AUTH}`;
 
     return (
-        <div className="w-full flex flex-col items-center">
+        <div className="w-full max-h-screen overflow-y-auto flex flex-col items-center">
             {!isLoginPage && <TopHeader />}
             <Header />
             {!isLoginPage && <Navigation />}
