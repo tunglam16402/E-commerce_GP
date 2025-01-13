@@ -154,7 +154,16 @@ const login = asyncHandler(async (req, res) => {
 //API get info current user login
 const getCurrent = asyncHandler(async (req, res) => {
     const { _id } = req.user;
-    const user = await User.findById({ _id }).select('-refreshToken -password');
+    const user = await User.findById(_id)
+        .select('-refreshToken -password')
+        .populate({
+            path: 'cart',
+            populate: {
+                path: 'product',
+                select: 'title thumb color price',
+            },
+        })
+        .populate('wishlist', 'title thumb price color');
     return res.status(200).json({
         success: !!user,
         response: user ? user : 'User not found',
@@ -389,8 +398,8 @@ const deleteUser = asyncHandler(async (req, res) => {
 //API update user
 const updateUser = asyncHandler(async (req, res) => {
     const { _id } = req.user;
-    const { firstname, lastname, email, mobile } = req.body;
-    const data = { firstname, lastname, email, mobile };
+    const { firstname, lastname, email, mobile, address } = req.body;
+    const data = { firstname, lastname, email, mobile, address };
     if (req.file) data.avatar = req.file.path;
     if (!_id || Object.keys(req.body).length === 0) {
         throw new Error('Missing inputs');
@@ -431,46 +440,61 @@ const updateUserAddress = asyncHandler(async (req, res) => {
 
 const updateCart = asyncHandler(async (req, res) => {
     const { _id } = req.user;
-    const { pid, quantity, color } = req.body;
-    if (!pid || !quantity || !color) {
+    const { pid, quantity = 1, color, price, thumb, title } = req.body;
+    if (!pid || !color) {
         throw new Error('Missing inputs');
     }
     const user = await User.findById(_id).select('cart');
     //check xem sp đã có trong giỏ hàng chưa
-    const alreadyProduct = user?.cart?.find((element) => element.product.toString() === pid);
+    const alreadyProduct = user?.cart?.find((element) => element.product.toString() === pid && element.color === color);
+
     if (alreadyProduct) {
-        if (alreadyProduct.color === color) {
-            const response = await User.updateOne(
-                { cart: { $elemMatch: alreadyProduct } },
-                { $set: { 'cart.$.quantity': quantity } },
-                { new: true },
-            );
-            return res.status(200).json({
-                success: response ? true : false,
-                updateUser: response ? response : 'Something went wrong',
-            });
-        } else {
-            const response = await User.findByIdAndUpdate(
-                _id,
-                { $push: { cart: { product: pid, quantity, color } } },
-                { new: true },
-            );
-            return res.status(200).json({
-                success: response ? true : false,
-                updateUser: response ? response : 'Something went wrong',
-            });
-        }
-    } else {
-        const response = await User.findByIdAndUpdate(
-            _id,
-            { $push: { cart: { product: pid, quantity, color } } },
+        const response = await User.updateOne(
+            { cart: { $elemMatch: alreadyProduct } },
+            {
+                $set: {
+                    'cart.$.quantity': quantity,
+                    'cart.$.price': price,
+                    'cart.$.thumb': thumb,
+                    'cart.$.title': title,
+                },
+            },
             { new: true },
         );
         return res.status(200).json({
             success: response ? true : false,
-            updateUser: response ? response : 'Something went wrong',
+            message: response ? 'Product has been added to cart' : 'Something went wrong',
+        });
+    } else {
+        const response = await User.findByIdAndUpdate(
+            _id,
+            { $push: { cart: { product: pid, quantity, color, price, thumb, title } } },
+            { new: true },
+        );
+        return res.status(200).json({
+            success: response ? true : false,
+            message: response ? 'Product has been added to cart' : 'Something went wrong',
         });
     }
+});
+
+const removeProductInCart = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    const { pid, color } = req.params;
+    const user = await User.findById(_id).select('cart');
+    //check xem sp đã có trong giỏ hàng chưa
+    const alreadyProduct = user?.cart?.find((element) => element.product.toString() === pid && element.color === color);
+    if (!alreadyProduct) {
+        return res.status(200).json({
+            success: true,
+            message: 'Cart updated',
+        });
+    }
+    const response = await User.findByIdAndUpdate(_id, { $pull: { cart: { product: pid, color } } }, { new: true });
+    return res.status(200).json({
+        success: response ? true : false,
+        message: response ? 'Product has been removed' : 'Something went wrong',
+    });
 });
 
 //API create user
@@ -480,6 +504,27 @@ const createUser = asyncHandler(async (req, res) => {
         success: response ? true : false,
         updateUser: response ? response : 'Something went wrong',
     });
+});
+
+//API update wishlist user
+const updateWishList = asyncHandler(async (req, res) => {
+    const { pid } = req.params;
+    const { _id } = req.user;
+    const user = await User.findById(_id);
+    const alreadyInWishList = user.wishlist?.find((element) => element.toString() === pid);
+    if (alreadyInWishList) {
+        const response = await User.findByIdAndUpdate(_id, { $pull: { wishlist: pid } }, { new: true });
+        return res.status(200).json({
+            success: response ? true : false,
+            message: response ? 'Product has been add to your Wishlist' : 'failed to update wishlist',
+        });
+    } else {
+        const response = await User.findByIdAndUpdate(_id, { $push: { wishlist: pid } }, { new: true });
+        return res.status(200).json({
+            success: response ? true : false,
+            message: response ? 'Product has been add to your Wishlist' : 'failed to update wishlist',
+        });
+    }
 });
 
 module.exports = {
@@ -498,4 +543,6 @@ module.exports = {
     updateUserAddress,
     updateCart,
     createUser,
+    removeProductInCart,
+    updateWishList,
 };
