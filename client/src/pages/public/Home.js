@@ -1,11 +1,13 @@
-import { React} from 'react';
+import { React } from 'react';
 import { Sidebar, Banner, BestSeller, DealDaily, FeatureProducts, CustomSlider } from '../../components';
 import { useSelector } from 'react-redux';
 import icons from '../../utils/icons';
+import withBaseComponent from 'hocs/withBaseComponent';
+import { createSearchParams } from 'react-router-dom';
 
 const { IoIosArrowForward } = icons;
 
-const Home = () => {
+const Home = ({ navigate }) => {
     const { newProducts } = useSelector((state) => state.products);
     const { categories } = useSelector((state) => state.app);
 
@@ -49,7 +51,16 @@ const Home = () => {
                                         <h4 className="font-semibold uppercase mb-2">{element?.title}</h4>
                                         <ul>
                                             {element?.brand?.map((item, index) => (
-                                                <span key={index} className="flex gap-1 items-center text-gray-500 mb-1">
+                                                <span
+                                                    onClick={() =>
+                                                        navigate({
+                                                            pathname: `/${element.title}`,
+                                                            search: createSearchParams({ brand: item }).toString(),
+                                                        })
+                                                    }
+                                                    key={index}
+                                                    className="flex gap-1 cursor-pointer hover:text-main hover:underline items-center text-gray-500 mb-1"
+                                                >
                                                     <IoIosArrowForward></IoIosArrowForward>
                                                     <li key={item}>{item}</li>
                                                 </span>
@@ -62,12 +73,10 @@ const Home = () => {
                 </div>
             </div>
             <div className="my-8 w-main">
-                <h3 className="text-[20px] font-semibold py-[15px] border-b-2 border-main uppercase">
-                    blog posts
-                </h3>
+                <h3 className="text-[20px] font-semibold py-[15px] border-b-2 border-main uppercase">blog posts</h3>
             </div>
         </>
     );
 };
 
-export default Home;
+export default withBaseComponent(Home);

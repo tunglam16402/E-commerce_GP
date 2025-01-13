@@ -23,10 +23,12 @@ const FeatureProducts = () => {
                     {products?.map((element) => (
                         <ProductCard
                             key={element._id}
+                            pid={element._id}
                             image={element.thumb}
-                            title={element.title}
-                            totalRatings={element.totalRatings}
-                            price={element.price}
+                            // title={element.title}
+                            // totalRatings={element.totalRatings}
+                            // price={element.price}
+                            {...element}
                         ></ProductCard>
                     ))}
                 </div>

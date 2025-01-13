@@ -102,7 +102,7 @@ const DetailProduct = ({ isQuickView, data, dispatch, navigate, location }) => {
             fetchProductData();
             fetchProduct();
         }
-        titleRef.current.scrollIntoView({ block: 'start' });
+        titleRef.current?.scrollIntoView({ block: 'start' });
     }, [pid]);
     //handle after submit rate product
     useEffect(() => {

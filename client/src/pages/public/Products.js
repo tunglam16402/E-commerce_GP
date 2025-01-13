@@ -21,7 +21,10 @@ const Products = () => {
     const { category } = useParams();
 
     const fetchProductsByCategory = async (queries) => {
-        const response = await apiGetProducts({ ...queries, category });
+        if (category && category !== 'products') {
+            queries.category = category;
+        }
+        const response = await apiGetProducts(queries);
         if (response.success) setProduct(response);
     };
 
@@ -114,7 +117,7 @@ const Products = () => {
                     columnClassName="my-masonry-grid_column mb-[-20px]"
                 >
                     {product?.products?.map((element) => (
-                        <Product key={element._id} pid={element.id} productData={element} normal={true}></Product>
+                        <Product key={element._id} pid={element._id} productData={element} normal={true}></Product>
                     ))}
                 </Masonry>
             </div>

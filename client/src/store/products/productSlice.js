@@ -6,11 +6,12 @@ export const productSlice = createSlice({
     initialState: {
         newProducts: null,
         errorMessage: '',
+        dealDaily: null,
     },
     reducers: {
-        // logout: (state) => {
-        //     state.isLoading = false;
-        // },
+        getDealDaily: (state, action) => {
+            state.dealDaily = action.payload;
+        },
     },
     // Code logic xử lý async action
     extraReducers: (builder) => {
@@ -34,7 +35,6 @@ export const productSlice = createSlice({
     },
 });
 
-// eslint-disable-next-line no-empty-pattern
-// export const {} = productSlice.actions;
+export const { getDealDaily } = productSlice.actions;
 
 export default productSlice.reducer;

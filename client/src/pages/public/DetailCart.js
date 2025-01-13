@@ -1,14 +1,38 @@
 /* eslint-disable jsx-a11y/heading-has-content */
-import { Breadcrumbs, Button, OrderItem, SelectQuantity } from 'components';
+import { Breadcrumbs, Button, OrderItem } from 'components';
 import withBaseComponent from 'hocs/withBaseComponent';
 import React, { memo } from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { createSearchParams } from 'react-router-dom';
+import { useSearchParam } from 'react-use';
+import Swal from 'sweetalert2';
 import { formatMoney } from 'utils/helper';
 import path from 'utils/path';
 
-const DetailCart = ({ location, dispatch }) => {
-    const { currentCart } = useSelector((state) => state.user);
+const DetailCart = ({ location, navigate }) => {
+    const { currentCart, current } = useSelector((state) => state.user);
+    const handleSubmit = () => {
+        if (!current?.address) {
+            return Swal.fire({
+                title: 'Almost...',
+                text: 'Please update your address before checkout!',
+                cancelButtonText: 'Not now',
+                confirmButtonText: 'Go update',
+                icon: 'info',
+                showCancelButton: true,
+            }).then((rs) => {
+                if (rs.isConfirmed) {
+                    navigate({
+                        pathname: `/${path.MEMBER}/${path.PERSONAL}`,
+                        search: createSearchParams({ redirect: location.pathname }).toString(),
+                    });
+                }
+            });
+        } else {
+            window.open(`/${path.CHECKOUT}`, '_blank');
+        }
+    };
+    console.log(location.pathname);
 
     return (
         <div className="w-full">
@@ -45,13 +69,7 @@ const DetailCart = ({ location, dispatch }) => {
                     )} VND`}</span>
                 </span>
                 <span className="text-gray-700 italic">Shipping, taxes, and discounts calculated at checkout</span>
-                <Link
-                target='_blank'
-                    className="bg-main text-white font-semibold uppercase text-[20px] mt-4 px-20 py-3 rounded-md hover:bg-red-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-main "
-                    to={`/${path.CHECKOUT}`}
-                >
-                    Check out
-                </Link>
+                <Button handleOnclick={handleSubmit}>Check Out</Button>
             </div>
         </div>
     );

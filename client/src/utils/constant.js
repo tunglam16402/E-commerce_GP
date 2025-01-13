@@ -17,6 +17,7 @@ const {
     MdFavorite,
     FaHistory,
     FaShoppingCart,
+    IoMdHome,
 } = icons;
 
 export const navigation = [
@@ -251,4 +252,22 @@ export const memberSidebar = [
         path: `/${path.MEMBER}/${path.HISTORY_BUY}`,
         icon: <FaHistory size={20} />,
     },
+    {
+        id: 4,
+        type: 'SINGLE',
+        text: 'Go to Homepage',
+        path: `/`,
+        icon: <IoMdHome  size={20} />,
+    },
 ];
+
+export const statusOrders = [
+    {
+        label: 'Cancelled',
+        value: 'Cancelled'
+    },
+    {
+        label: 'Succeed',
+        value: 'Succeed'
+    }
+]

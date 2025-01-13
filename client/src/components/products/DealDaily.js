@@ -1,7 +1,7 @@
 import { React, useEffect, useState, memo } from 'react';
 import icons from 'utils/icons';
 import { apiGetProducts } from 'apis/product';
-import { formatMoney, renderStarFromNumber, secondsToHms, } from 'utils/helper';
+import { formatMoney, renderStarFromNumber, secondsToHms } from 'utils/helper';
 import { DealCountDown } from 'components';
 import moment from 'moment';
 
@@ -17,9 +17,9 @@ const DealDaily = () => {
     const [expireTime, setExpireTime] = useState(false);
 
     const fetchDealDaily = async () => {
-        const response = await apiGetProducts({ limit: 1, page: Math.round(Math.random() * 6), totalRatings: 5 });
+        const response = await apiGetProducts({ sort: '-totalRatings', limit: 20 });
         if (response.success) {
-            setDealDaily(response.products[0]);
+            setDealDaily(response.products[Math.round(Math.random() * 20)]);
             //time reset = 5 am
             const today = `${moment().format('MM/DD/YYYY')} 5:00:00`;
             const seconds = new Date(today).getTime() - new Date().getTime() + 24 * 3600 * 1000;
@@ -116,3 +116,4 @@ const DealDaily = () => {
 };
 
 export default memo(DealDaily);
+

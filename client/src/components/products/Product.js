@@ -9,16 +9,17 @@ import { createSearchParams, Link } from 'react-router-dom';
 import withBaseComponent from 'hocs/withBaseComponent';
 import { DetailProduct } from 'pages/public';
 import { showModal } from 'store/app/appSlice';
-import { apiUpdateCart } from 'apis';
+import { apiUpdateCart, apiUpdateWishlist } from 'apis';
 import { toast } from 'react-toastify';
 import { getCurrent } from 'store/users/asyncAction';
 import { useSelector } from 'react-redux';
 import Swal from 'sweetalert2';
 import path from 'utils/path';
+import clsx from 'clsx';
 
 const { BsFillSuitHeartFill, AiFillEye, FaCartPlus, BsFillCartCheckFill } = icons;
 
-const Product = ({ productData, isNew, normal, navigate, dispatch, location }) => {
+const Product = ({ productData, isNew, normal, navigate, dispatch, location, pid, className }) => {
     const [isShowOption, setIsShowOption] = useState(false);
     const { current } = useSelector((state) => state.user);
 
@@ -55,7 +56,13 @@ const Product = ({ productData, isNew, normal, navigate, dispatch, location }) =
                 dispatch(getCurrent());
             } else toast.error(response.message);
         }
-        if (flag === 'WISHLIST') console.log('Wishlist');
+        if (flag === 'WISHLIST') {
+            const response = await apiUpdateWishlist(pid);
+            if (response.success) {
+                dispatch(getCurrent());
+                // toast.success(response.message);
+            } else toast.error(response.message);
+        }
         if (flag === 'QUICK_VIEW') {
             dispatch(
                 showModal({
@@ -66,11 +73,10 @@ const Product = ({ productData, isNew, normal, navigate, dispatch, location }) =
                 }),
             );
         }
-        console.log(current.cart, productData._id.toString());
     };
 
     return (
-        <div className="w-full text-base px-[10px] cursor-pointer">
+        <div className={clsx('w-full text-base px-[10px] cursor-pointer', className)}>
             <div
                 className="w-full border p-[15px] flex flex-col items-center"
                 onClick={(e) =>
@@ -103,7 +109,14 @@ const Product = ({ productData, isNew, normal, navigate, dispatch, location }) =
                                 </span>
                             )}
                             <span title="Add to Wishlist" onClick={(e) => handleClickOptions(e, 'WISHLIST')}>
-                                <SelectOption icons={<BsFillSuitHeartFill size={22} />}></SelectOption>
+                                <SelectOption
+                                    icons={
+                                        <BsFillSuitHeartFill
+                                            size={22}
+                                            color={current?.wishlist?.some((i) => i?._id === pid) ? 'red' : 'gray'}
+                                        />
+                                    }
+                                ></SelectOption>
                             </span>
                         </div>
                     )}

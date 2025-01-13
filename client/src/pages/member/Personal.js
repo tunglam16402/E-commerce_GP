@@ -2,13 +2,15 @@ import { Button, InputForm } from 'components';
 import moment from 'moment';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import avatarDefault from 'assets/img/avt_default.png';
 import { apiUpdateCurrent } from 'apis';
 import { getCurrent } from 'store/users/asyncAction';
 import { toast } from 'react-toastify';
+import { useSearchParams } from 'react-router-dom';
+import withBaseComponent from 'hocs/withBaseComponent';
 
-const Personal = () => {
+const Personal = ({ dispatch, navigate }) => {
     const {
         register,
         formState: { errors, isDirty },
@@ -16,7 +18,7 @@ const Personal = () => {
         reset,
     } = useForm();
     const { current } = useSelector((state) => state.user);
-    const dispatch = useDispatch();
+    const [searchParams] = useSearchParams();
 
     useEffect(() => {
         reset({
@@ -25,6 +27,7 @@ const Personal = () => {
             mobile: current?.mobile,
             email: current?.email,
             avatar: current?.avatar,
+            address: current?.address,
         });
     }, [current]);
 
@@ -42,9 +45,10 @@ const Personal = () => {
         if (response.success) {
             dispatch(getCurrent());
             toast.success(response.message);
+            if (searchParams?.get('redirect')) {
+                navigate(searchParams.get('redirect'));
+            }
         } else toast.error(response.message);
-
-        console.log([...formData]);
     };
 
     return (
@@ -99,6 +103,16 @@ const Personal = () => {
                     }}
                     fullWidth
                 />
+                <InputForm
+                    label="Shipping address"
+                    register={register}
+                    errors={errors}
+                    id="address"
+                    validate={{
+                        required: 'Need fill this fields',
+                    }}
+                    fullWidth
+                />
                 <div className="flex items-center gap-2">
                     <span className="font-medium">Account status:</span>
                     <span>{current?.isBlocked ? 'Blocked' : 'Actived'}</span>
@@ -132,4 +146,4 @@ const Personal = () => {
     );
 };
 
-export default Personal;
+export default withBaseComponent(Personal);

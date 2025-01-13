@@ -3,7 +3,7 @@ import { GrMail } from 'react-icons/gr';
 import { FaShoppingCart, FaTruck, FaReply, FaProductHunt, FaHistory, FaCartPlus } from 'react-icons/fa';
 import { FaUser } from 'react-icons/fa';
 import { BsFillSuitHeartFill, BsShieldShaded, BsFillCartCheckFill } from 'react-icons/bs';
-import { IoIosArrowForward } from 'react-icons/io';
+import { IoIosArrowForward, IoMdHome } from 'react-icons/io';
 import { AiFillStar, AiOutlineStar, AiFillEye, AiOutlineMenu, AiOutlineDown } from 'react-icons/ai';
 import { IoLogOutSharp, IoCreate, IoPersonCircle } from 'react-icons/io5';
 import { HiGift } from 'react-icons/hi';
@@ -39,6 +39,7 @@ const icons = {
     FaHistory,
     FaCartPlus,
     BsFillCartCheckFill,
+    IoMdHome,
 };
 
 export default icons;

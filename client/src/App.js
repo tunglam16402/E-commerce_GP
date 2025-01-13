@@ -14,7 +14,7 @@ import {
     DetailCart,
 } from 'pages/public';
 import { AdminLayout, ManageOrders, ManageProducts, ManageUsers, Dashboard, CreateProducts } from 'pages/admin';
-import { MemberLayout, Personal, MyCart, HistoryBuy, WishList, CheckOut } from 'pages/member';
+import { MemberLayout, Personal, HistoryBuy, WishList, CheckOut } from 'pages/member';
 import path from 'utils/path';
 import { getCategories } from 'store/app/asyncAction';
 import { useDispatch, useSelector } from 'react-redux';
@@ -46,7 +46,7 @@ function App() {
                 <Route path={path.CHECKOUT} element={<CheckOut />}></Route>
                 <Route path={path.PUBLIC} element={<Public />}>
                     <Route path={path.HOME} element={<Home />}></Route>
-                    <Route path={path.PRODUCTS} element={<Products />}></Route>
+                    <Route path={path.PRODUCTS__CATEGORY} element={<Products />}></Route>
                     <Route path={path.BLOGS} element={<Blogs />}></Route>
                     <Route path={path.DETAIL_PRODUCT__CATEGORY__PID__TITLE} element={<DetailProduct />}></Route>
                     <Route path={path.OUR_SERVICES} element={<Services />}></Route>
@@ -66,7 +66,6 @@ function App() {
                 </Route>
                 <Route path={path.MEMBER} element={<MemberLayout />}>
                     <Route path={path.PERSONAL} element={<Personal />}></Route>
-                    <Route path={path.MY_CART} element={<MyCart />}></Route>
                     <Route path={path.WISHLIST} element={<WishList />}></Route>
                     <Route path={path.HISTORY_BUY} element={<HistoryBuy />}></Route>
                 </Route>

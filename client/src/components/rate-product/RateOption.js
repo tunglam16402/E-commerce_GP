@@ -12,7 +12,7 @@ const RateOption = ({ nameProduct, handleSubmitRateAction }) => {
 
     //handle content appeare in the middle of the screen
     useEffect(() => {
-        modalRef.current.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        modalRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' });
     });
     return (
         <div

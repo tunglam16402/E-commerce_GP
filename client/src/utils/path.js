@@ -5,7 +5,7 @@ const path = {
     ALL: '*',
     AUTH: 'authentication',
     REGISTER: 'register',
-    PRODUCTS: ':category',
+    PRODUCTS__CATEGORY: ':category',
     BLOGS: 'blogs',
     OUR_SERVICES: 'services',
     FAQS: 'faqs',
@@ -14,6 +14,7 @@ const path = {
     RESET_PASSWORD: 'resetpassword/:token',
     DETAIL_CART: 'my-cart',
     CHECKOUT: 'checkout',
+    PRODUCTS: 'products',
 
     //Admin path
     ADMIN: 'admin',
@@ -26,7 +27,6 @@ const path = {
     //Member path
     MEMBER: 'member',
     PERSONAL: 'personal',
-    MY_CART: 'my-cart',
     WISHLIST: 'wishlist',
     HISTORY_BUY: 'history-buy',
 };
