@@ -73,16 +73,7 @@ const HistoryBuy = ({ dispatch, navigate, location }) => {
                         <th className="px-4 py-2">#</th>
                         <th className="px-4 py-2">Products</th>
                         <th className="px-4 py-2">Total</th>
-                        <th className="px-4 py-2">
-                            <div className="">
-                                <CustomSelect
-                                    options={statusOrders}
-                                    value={status}
-                                    onChange={(value) => handleSearchStatus(value)}
-                                    wrapClassname="w-full"
-                                />
-                            </div>
-                        </th>
+                        <th className="px-4 py-2">Status</th>
                         <th className="px-4 py-2">Created at</th>
                         {/* <th className="px-4 py-2">Actions</th> */}
                     </tr>

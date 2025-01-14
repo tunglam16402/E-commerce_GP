@@ -20,7 +20,7 @@ import { getCategories } from 'store/app/asyncAction';
 import { useDispatch, useSelector } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { ScrollToTop, Modal, Cart } from 'components';
+import { ScrollToTop, Modal, Cart, Chatbot } from 'components';
 import { showCart } from 'store/app/appSlice';
 
 function App() {
@@ -70,6 +70,7 @@ function App() {
                     <Route path={path.HISTORY_BUY} element={<HistoryBuy />}></Route>
                 </Route>
             </Routes>
+            <Chatbot />
             <ToastContainer
                 position="top-right"
                 autoClose={5000}

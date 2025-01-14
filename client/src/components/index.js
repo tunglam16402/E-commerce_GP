@@ -35,6 +35,7 @@ export { default as Comments } from './rate-product/Comments';
 export { default as Pagination } from './pagination/Pagination';
 export { default as PaginationItem } from './pagination/PaginationItem';
 export { default as Loading } from './common/Loading';
+export { default as Chatbot } from './chatbot/Chatbot';
 
 //Admin
 export { default as AdminSidebar } from './sidebars/AdminSidebar';

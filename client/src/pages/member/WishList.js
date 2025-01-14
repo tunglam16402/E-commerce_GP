@@ -13,7 +13,7 @@ const WishList = () => {
                         <Product
                             pid={element._id}
                             productData={element}
-                            className="bg-white rounded-md drop-shadow flex flex-col pt-3 gap-3 w-[283px]"
+                            className="bg-white rounded-md drop-shadow flex flex-col pt-3 gap-3 w-[284px]"
                         />
                     </div>
                 ))}

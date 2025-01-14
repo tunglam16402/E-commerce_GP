@@ -4,12 +4,13 @@ import { apiGetProducts } from 'apis/product';
 import { formatMoney, renderStarFromNumber, secondsToHms } from 'utils/helper';
 import { DealCountDown } from 'components';
 import moment from 'moment';
+import withBaseComponent from 'hocs/withBaseComponent';
 
 const { AiFillStar, AiOutlineMenu } = icons;
 
 let idInterval;
 
-const DealDaily = () => {
+const DealDaily = ({ productData, isNew, normal, navigate, dispatch, location, pid, className }) => {
     const [dealDaily, setDealDaily] = useState(null);
     const [hour, setHour] = useState(0);
     const [minute, setMinute] = useState(0);
@@ -42,7 +43,7 @@ const DealDaily = () => {
     // }, []);
 
     useEffect(() => {
-        clearInterval(idInterval);
+        idInterval && clearInterval(idInterval);
         fetchDealDaily();
     }, [expireTime]);
 
@@ -108,12 +109,17 @@ const DealDaily = () => {
                     className="flex gap-2 items-center justify-center w-full text-white bg-main hover:bg-gray-800 py-2 font-medium "
                 >
                     <AiOutlineMenu></AiOutlineMenu>
-                    <span>OPTIONS</span>
+                    <span
+                        onClick={(e) =>
+                            navigate(`/${dealDaily?.category?.toLowerCase()}/${dealDaily?._id}/${dealDaily?.title}`)
+                        }
+                    >
+                        OPTIONS
+                    </span>
                 </button>
             </div>
         </div>
     );
 };
 
-export default memo(DealDaily);
-
+export default withBaseComponent(memo(DealDaily));

@@ -21,7 +21,7 @@ const MemberSidebar = () => {
 
     return (
         <div className="py-4  h-full bg-white shadow-lg">
-            <div className="w-full flex flex-col items-center py-4">
+            <div className="w-full flex flex-col items-center py-4 gap-4">
                 <img src={current?.avatar || avatarDefault} alt="logo" className="w-16 h-16 object-cover  "></img>
                 <small>{`${current?.lastname} ${current?.firstname}`}</small>
             </div>

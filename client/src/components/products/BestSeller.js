@@ -4,6 +4,7 @@ import { Product, CustomSlider } from 'components';
 import { getNewProducts } from 'store/products/asyncAction';
 import { useDispatch, useSelector } from 'react-redux';
 
+
 const tabs = [
     { id: 1, name: 'best seller' },
     { id: 2, name: 'new arrivals' },

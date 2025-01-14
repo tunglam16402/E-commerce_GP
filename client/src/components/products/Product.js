@@ -126,8 +126,8 @@ const Product = ({ productData, isNew, normal, navigate, dispatch, location, pid
                             'https://tse3.mm.bing.net/th?id=OIP.uOQ047yW1qXUtl2dpGhwvQHaHa&pid=Api&P=0&h=220'
                         }
                         alt="Product img"
-                        // className="w-[274px] h-[274px] object-cover"
-                        className="w-full object-contain"
+                        className="w-[274px] h-[274px] object-cover"
+                        // className="w-full object-contain"
                     ></img>
                     {!normal && (
                         <img
