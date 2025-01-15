@@ -23,6 +23,9 @@ const path = {
     MANAGE_PRODUCTS: 'manage-products',
     MANAGE_ORDER: 'manage-orders',
     CREATE_PRODUCTS: 'create-products',
+    CREATE_BLOGs: 'create-blog',
+    MANAGE_BRAND: 'create-blog',
+    CREATE_BRAND: 'create-blog',
 
     //Member path
     MEMBER: 'member',

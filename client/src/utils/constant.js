@@ -18,6 +18,10 @@ const {
     FaHistory,
     FaShoppingCart,
     IoMdHome,
+    SiBrandfolder,
+    MdCategory,
+    PiFlagBannerFill,
+    FaNewspaper,
 } = icons;
 
 export const navigation = [
@@ -198,6 +202,78 @@ export const adminSidebar = [
         path: `/${path.ADMIN}/${path.MANAGE_ORDER}`,
         icon: <RiBillLine size={20} />,
     },
+    {
+        id: 5,
+        type: 'PARENT',
+        text: 'Manage product Category',
+        icon: <MdCategory size={20} />,
+        submenu: [
+            {
+                text: 'Create new Category',
+                path: `/${path.ADMIN}/${path.CREATE_PRODUCTS}`,
+                icon: <IoCreate size={20} />,
+            },
+            {
+                text: 'Product Category List',
+                path: `/${path.ADMIN}/${path.MANAGE_PRODUCTS}`,
+                icon: <MdCategory size={20} />,
+            },
+        ],
+    },
+    {
+        id: 6,
+        type: 'PARENT',
+        text: 'Manage Brand',
+        icon: <SiBrandfolder size={20} />,
+        submenu: [
+            {
+                text: 'Create new Brand',
+                path: `/${path.ADMIN}/${path.CREATE_PRODUCTS}`,
+                icon: <IoCreate size={20} />,
+            },
+            {
+                text: 'Brand List',
+                path: `/${path.ADMIN}/${path.MANAGE_PRODUCTS}`,
+                icon: <SiBrandfolder size={20} />,
+            },
+        ],
+    },
+    {
+        id: 7,
+        type: 'PARENT',
+        text: 'Manage Blog',
+        icon: <FaNewspaper size={20} />,
+        submenu: [
+            {
+                text: 'Create new Blog',
+                path: `/${path.ADMIN}/${path.CREATE_PRODUCTS}`,
+                icon: <IoCreate size={20} />,
+            },
+            {
+                text: 'Blog List',
+                path: `/${path.ADMIN}/${path.MANAGE_PRODUCTS}`,
+                icon: <FaNewspaper size={20} />,
+            },
+        ],
+    },
+    {
+        id: 8,
+        type: 'PARENT',
+        text: 'Manage Banner',
+        icon: <PiFlagBannerFill size={20} />,
+        submenu: [
+            {
+                text: 'Create new Banner',
+                path: `/${path.ADMIN}/${path.CREATE_PRODUCTS}`,
+                icon: <IoCreate size={20} />,
+            },
+            {
+                text: 'Banner List',
+                path: `/${path.ADMIN}/${path.MANAGE_PRODUCTS}`,
+                icon: <PiFlagBannerFill size={20} />,
+            },
+        ],
+    },
 ];
 
 export const role = [
@@ -253,21 +329,21 @@ export const memberSidebar = [
         icon: <FaHistory size={20} />,
     },
     {
-        id: 4,
+        id: 5,
         type: 'SINGLE',
         text: 'Go to Homepage',
         path: `/`,
-        icon: <IoMdHome  size={20} />,
+        icon: <IoMdHome size={20} />,
     },
 ];
 
 export const statusOrders = [
     {
         label: 'Cancelled',
-        value: 'Cancelled'
+        value: 'Cancelled',
     },
     {
         label: 'Succeed',
-        value: 'Succeed'
-    }
-]
+        value: 'Succeed',
+    },
+];

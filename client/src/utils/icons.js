@@ -7,8 +7,10 @@ import { IoIosArrowForward, IoMdHome } from 'react-icons/io';
 import { AiFillStar, AiOutlineStar, AiFillEye, AiOutlineMenu, AiOutlineDown } from 'react-icons/ai';
 import { IoLogOutSharp, IoCreate, IoPersonCircle } from 'react-icons/io5';
 import { HiGift } from 'react-icons/hi';
-import { FaTty, FaStore } from 'react-icons/fa6';
-import { MdSpaceDashboard, MdGroups2, MdFavorite } from 'react-icons/md';
+import { FaTty, FaStore, FaNewspaper } from 'react-icons/fa6';
+import { MdSpaceDashboard, MdGroups2, MdFavorite, MdCategory } from 'react-icons/md';
+import { SiBrandfolder } from 'react-icons/si';
+import { PiFlagBannerFill } from 'react-icons/pi';
 
 const icons = {
     RiPhoneFill,
@@ -40,6 +42,10 @@ const icons = {
     FaCartPlus,
     BsFillCartCheckFill,
     IoMdHome,
+    SiBrandfolder,
+    MdCategory,
+    PiFlagBannerFill,
+    FaNewspaper,
 };
 
 export default icons;

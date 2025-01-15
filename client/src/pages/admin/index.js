@@ -5,3 +5,6 @@ export { default as ManageProducts } from './ManageProducts';
 export { default as ManageOrders } from './ManageOrders';
 export { default as CreateProducts } from './CreateProducts';
 export { default as UpdateProduct } from './UpdateProduct';
+export { default as CreateBrand } from './CreateBrand';
+export { default as ManageBrand } from './ManageBrand';
+export { default as CreateBlog } from './CreateBlog';
