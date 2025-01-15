@@ -3,6 +3,8 @@ const dbConnect = require('./config/dbconnect');
 const initRoutes = require('./routes');
 const cookieParse = require('cookie-parser');
 const cors = require('cors');
+const { notFound, errHandler } = require('./middlewares/errorHandler');
+
 require('dotenv').config();
 
 const app = express();
@@ -25,6 +27,7 @@ app.use(cookieParse());
 
 //liên kết db
 dbConnect();
+
 // liên kết api vào app
 initRoutes(app);
 
@@ -32,6 +35,8 @@ app.use('/', (req, res) => {
     res.send('SERVER ON');
 });
 
+app.use(notFound);
+app.use(errHandler);
 // web server
 app.listen(port, () => {
     console.log('Server running on the port: ' + port);
