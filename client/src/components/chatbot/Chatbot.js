@@ -432,7 +432,6 @@ const Chatbot = () => {
                 language-code="en"
             ></df-messenger>
             <div id="product-container">
-                {loading && <p>Loading products...</p>}
                 {products.length > 0 ? (
                     products.map((product, index) => (
                         <div key={index}>
@@ -444,7 +443,8 @@ const Chatbot = () => {
                         </div>
                     ))
                 ) : (
-                    <p>No products found.</p>
+                    // <p>No products found.</p>
+                    ''
                 )}
             </div>
         </div>

@@ -13,7 +13,16 @@ import {
     ResetPassword,
     DetailCart,
 } from 'pages/public';
-import { AdminLayout, ManageOrders, ManageProducts, ManageUsers, Dashboard, CreateProducts } from 'pages/admin';
+import {
+    AdminLayout,
+    ManageOrders,
+    ManageProducts,
+    ManageUsers,
+    Dashboard,
+    CreateProducts,
+    ManageBrand,
+    CreateBrand,
+} from 'pages/admin';
 import { MemberLayout, Personal, HistoryBuy, WishList, CheckOut } from 'pages/member';
 import path from 'utils/path';
 import { getCategories } from 'store/app/asyncAction';
@@ -61,8 +70,10 @@ function App() {
                     <Route path={path.DASHBOARD} element={<Dashboard />}></Route>
                     <Route path={path.MANAGE_USER} element={<ManageUsers />}></Route>
                     <Route path={path.MANAGE_PRODUCTS} element={<ManageProducts />}></Route>
+                    <Route path={path.MANAGE_BRAND} element={<ManageBrand />}></Route>
                     <Route path={path.MANAGE_ORDER} element={<ManageOrders />}></Route>
                     <Route path={path.CREATE_PRODUCTS} element={<CreateProducts />}></Route>
+                    <Route path={path.CREATE_BRAND} element={<CreateBrand />}></Route>
                 </Route>
                 <Route path={path.MEMBER} element={<MemberLayout />}>
                     <Route path={path.PERSONAL} element={<Personal />}></Route>

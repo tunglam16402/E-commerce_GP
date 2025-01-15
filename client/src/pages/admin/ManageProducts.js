@@ -35,6 +35,7 @@ const ManageProducts = () => {
 
     const fetchProducts = async (params) => {
         const response = await apiGetProducts({ ...params, limit: process.env.REACT_APP_LIMIT });
+        console.log(response);
         if (response.success) {
             setCounts(response.counts);
             setProducts(response.products);

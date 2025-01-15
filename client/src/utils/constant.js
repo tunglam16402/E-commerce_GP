@@ -228,12 +228,12 @@ export const adminSidebar = [
         submenu: [
             {
                 text: 'Create new Brand',
-                path: `/${path.ADMIN}/${path.CREATE_PRODUCTS}`,
+                path: `/${path.ADMIN}/${path.CREATE_BRAND}`,
                 icon: <IoCreate size={20} />,
             },
             {
                 text: 'Brand List',
-                path: `/${path.ADMIN}/${path.MANAGE_PRODUCTS}`,
+                path: `/${path.ADMIN}/${path.MANAGE_BRAND}`,
                 icon: <SiBrandfolder size={20} />,
             },
         ],
